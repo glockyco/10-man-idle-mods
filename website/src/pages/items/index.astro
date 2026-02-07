@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ItemFilter from "../../components/ItemFilter.svelte";
 import { query, hasDb } from "../../lib/db";
 
 interface Item {
@@ -30,33 +31,36 @@ const rarityColor: Record<string, string> = {
   {!hasDb && <p style="color: var(--text-dim);">Database not found. Run the DataExporter mod first.</p>}
   {hasDb && (
     <p style="color: var(--text-dim); margin: 0.5rem 0;">{items.length} items</p>
-    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
-      <thead>
-        <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-          <th style="padding: 0.5rem;">Name</th>
-          <th style="padding: 0.5rem;">Category</th>
-          <th style="padding: 0.5rem;">Rarity</th>
-          <th style="padding: 0.5rem;">Level</th>
-          <th style="padding: 0.5rem;">Slot</th>
-          <th style="padding: 0.5rem;">CP</th>
-        </tr>
-      </thead>
-      <tbody>
-        {items.map((item) => (
-          <tr style="border-bottom: 1px solid var(--border);">
-            <td style="padding: 0.5rem;">
-              <a href={`/items/${item.id}/`} style={`color: ${rarityColor[item.rarity] ?? "var(--text)"}`}>
-                {item.name}
-              </a>
-            </td>
-            <td style="padding: 0.5rem; color: var(--text-dim);">{item.category}</td>
-            <td style={`padding: 0.5rem; color: ${rarityColor[item.rarity] ?? "var(--text)"}`}>{item.rarity}</td>
-            <td style="padding: 0.5rem;">{item.item_level}</td>
-            <td style="padding: 0.5rem; color: var(--text-dim);">{item.slot ?? "—"}</td>
-            <td style="padding: 0.5rem;">{item.combat_power || "—"}</td>
+    <ItemFilter client:idle />
+    <noscript>
+      <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+            <th style="padding: 0.5rem;">Name</th>
+            <th style="padding: 0.5rem;">Category</th>
+            <th style="padding: 0.5rem;">Rarity</th>
+            <th style="padding: 0.5rem;">Level</th>
+            <th style="padding: 0.5rem;">Slot</th>
+            <th style="padding: 0.5rem;">CP</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {items.map((item) => (
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 0.5rem;">
+                <a href={`/items/${item.id}/`} style={`color: ${rarityColor[item.rarity] ?? "var(--text)"}`}>
+                  {item.name}
+                </a>
+              </td>
+              <td style="padding: 0.5rem; color: var(--text-dim);">{item.category}</td>
+              <td style={`padding: 0.5rem; color: ${rarityColor[item.rarity] ?? "var(--text)"}`}>{item.rarity}</td>
+              <td style="padding: 0.5rem;">{item.item_level}</td>
+              <td style="padding: 0.5rem; color: var(--text-dim);">{item.slot ?? "—"}</td>
+              <td style="padding: 0.5rem;">{item.combat_power || "—"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </noscript>
   )}
 </BaseLayout>

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Search from "../components/Search.svelte";
 ---
 
 <BaseLayout title="Home">
@@ -8,6 +9,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     Community game data wiki for 10-Man Idle. All data is extracted
     directly from the game files.
   </p>
+
+  <Search client:idle />
 
   <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-top: 2rem;">
     <a href="/items/" style="display: block; padding: 1.5rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;">
