@@ -25,29 +25,7 @@
   --color-role-dps: #f85149;
 }
 
-/*
- * CSS variable bridge — aliases the old inline-style custom properties
- * to the new Tailwind theme values. Keeps existing pages rendering
- * correctly through the migration phases. Remove after Phase 3.
- */
 @layer base {
-  :root {
-    --bg: var(--color-background);
-    --bg-surface: var(--color-surface);
-    --bg-elevated: var(--color-elevated);
-    --text: var(--color-foreground);
-    --text-dim: var(--color-muted);
-    --text-highlight: var(--color-highlight);
-    --accent: var(--color-accent);
-    --link: var(--color-link);
-    --border: var(--color-border);
-    --common: var(--color-rarity-common);
-    --uncommon: var(--color-rarity-uncommon);
-    --rare: var(--color-rarity-rare);
-    --epic: var(--color-rarity-epic);
-    --legendary: var(--color-rarity-legendary);
-  }
-
   * {
     margin: 0;
     padding: 0;
