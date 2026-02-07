@@ -1,0 +1,55 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.sln.docstates
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+
+# NuGet
+*.nupkg
+**/packages/
+*.nuget.props
+*.nuget.targets
+
+# Build output
+mods/build/
+mods/out/
+
+# User-specific build config
+Directory.Build.props.user
+
+# Node.js
+node_modules/
+website/dist/
+website/.astro/
+
+# pnpm
+.pnpm-debug.log
+
+# SQLite (generated, but we commit data/10man-idle.db)
+website/public/10man-idle.db
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Native build artifacts
+mods/src/VersionProxy/*.obj
+mods/src/VersionProxy/*.dll
+mods/src/VersionProxy/*.exp
+mods/src/VersionProxy/*.lib
+mods/src/VersionProxy/*.pdb
