@@ -13,7 +13,6 @@ export const hasDb = fs.existsSync(dbPath);
 export function getDb(): Database.Database {
   if (!db) {
     db = new Database(dbPath, { readonly: true });
-    db.pragma("journal_mode = WAL");
   }
   return db;
 }
