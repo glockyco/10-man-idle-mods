@@ -1,4 +1,8 @@
 <Project>
+  <!-- Import user-local settings (gitignored) if present -->
+  <Import Project="Directory.Build.props.user"
+          Condition="Exists('Directory.Build.props.user')" />
+
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -6,8 +10,7 @@
     <AnalysisMode>Recommended</AnalysisMode>
   </PropertyGroup>
 
-  <!-- GameDir: path to the 10-Man Idle game installation.
-       Set via Directory.Build.props.user, env var, or CLI override. -->
+  <!-- Fallback: read GameDir from environment variable -->
   <PropertyGroup Condition="'$(GameDir)' == ''">
     <GameDir>$(TENMAN_GAME_DIR)</GameDir>
   </PropertyGroup>

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <RootNamespace>TenManIdleMods.SpeedMod</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lib.Harmony" Version="2.3.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ModLoader\ModLoader.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(GameDir)' != ''">
+    <Reference Include="10ManIdle">
+      <HintPath>$(GameDir)\10ManIdle.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TacticsGuildIdle.Shared">
+      <HintPath>$(GameDir)\TacticsGuildIdle.Shared.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="MonoGame.Framework">
+      <HintPath>$(GameDir)\MonoGame.Framework.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
