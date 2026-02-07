@@ -1,0 +1,32 @@
+---
+const navLinks = [
+  { href: "/gathering/", label: "Gathering" },
+  { href: "/recipes/", label: "Crafting" },
+  { href: "/quests/", label: "Quests" },
+  { href: "/dungeons/", label: "Dungeons" },
+  { href: "/raids/", label: "Raids" },
+  { href: "/items/", label: "Items" },
+  { href: "/classes/", label: "Classes" },
+  { href: "/suffixes/", label: "Suffixes" },
+  { href: "/mechanics/", label: "Mechanics" },
+];
+---
+
+<nav class="sticky top-0 z-50 bg-surface border-b border-border">
+  <div class="max-w-[1200px] mx-auto px-4 py-3 flex items-center gap-8">
+    <a href="/" class="text-xl font-bold text-highlight hover:no-underline">
+      10-Man Codex
+    </a>
+    <div class="hidden md:flex gap-5">
+      {navLinks.map((link) => (
+        <a
+          href={link.href}
+          class="text-muted text-sm hover:text-foreground hover:no-underline"
+        >
+          {link.label}
+        </a>
+      ))}
+    </div>
+    <div id="search-widget" class="ml-auto"></div>
+  </div>
+</nav>

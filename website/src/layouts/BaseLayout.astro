@@ -1,10 +1,20 @@
 ---
+import "../styles/global.css";
+import Nav from "../components/layout/Nav.astro";
+import Breadcrumbs from "../components/layout/Breadcrumbs.astro";
+import Footer from "../components/layout/Footer.astro";
+
 interface Props {
   title: string;
   description?: string;
+  crumbs?: { label: string; href?: string }[];
 }
 
-const { title, description = "Game data codex for 10-Man Idle" } = Astro.props;
+const {
+  title,
+  description = "Game data codex for 10-Man Idle",
+  crumbs,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -14,78 +24,13 @@ const { title, description = "Game data codex for 10-Man Idle" } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <title>{title} - 10-Man Codex</title>
-    <style is:global>
-      :root {
-        --bg: #1a1a2e;
-        --bg-surface: #16213e;
-        --bg-elevated: #0f3460;
-        --text: #e0e0e0;
-        --text-dim: #a0a0b0;
-        --text-highlight: #e8d44d;
-        --accent: #e94560;
-        --link: #5ca0d3;
-        --border: #2a2a4a;
-        --common: #9d9d9d;
-        --uncommon: #1eff00;
-        --rare: #0070dd;
-        --epic: #a335ee;
-        --legendary: #ff8000;
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        line-height: 1.6;
-      }
-
-      a {
-        color: var(--link);
-        text-decoration: none;
-      }
-
-      a:hover {
-        text-decoration: underline;
-      }
-
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 1rem;
-      }
-    </style>
   </head>
   <body>
-    <header style="background: var(--bg-surface); border-bottom: 1px solid var(--border); padding: 1rem 0;">
-      <div class="container" style="display: flex; align-items: center; gap: 2rem;">
-        <a href="/" style="font-size: 1.25rem; font-weight: bold; color: var(--text-highlight);">
-          10-Man Codex
-        </a>
-        <nav style="display: flex; gap: 1rem;">
-          <a href="/gathering/">Gathering</a>
-          <a href="/recipes/">Crafting</a>
-          <a href="/quests/">Quests</a>
-          <a href="/dungeons/">Dungeons</a>
-          <a href="/raids/">Raids</a>
-          <a href="/items/">Items</a>
-          <a href="/classes/">Classes</a>
-        </nav>
-      </div>
-    </header>
-    <main class="container" style="padding: 2rem 1rem;">
+    <Nav />
+    {crumbs && <Breadcrumbs crumbs={crumbs} />}
+    <main class="max-w-[1200px] mx-auto px-4 py-8">
       <slot />
     </main>
-    <footer style="border-top: 1px solid var(--border); padding: 1rem 0; text-align: center; color: var(--text-dim); font-size: 0.875rem;">
-      <div class="container">
-        Data extracted from 10-Man Idle. Not affiliated with the game developers.
-      </div>
-    </footer>
+    <Footer />
   </body>
 </html>

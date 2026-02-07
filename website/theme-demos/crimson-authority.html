@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crimson Authority Theme — 10-Man Codex</title>
+<style>
+  :root {
+    --bg: #0a0e27;
+    --surface: #111638;
+    --elevated: #1a2048;
+    --foreground: #e2e4ef;
+    --muted: #8e91a8;
+    --highlight: #f0c040;
+    --accent: #dc3545;
+    --link: #6ea8fe;
+    --border: #252a4a;
+    --common: #9d9d9d;
+    --uncommon: #1eff00;
+    --rare: #0070dd;
+    --epic: #a335ee;
+    --legendary: #ff8000;
+    --role-tank: #0070dd;
+    --role-healer: #1eff00;
+    --role-dps: #dc3545;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--foreground);
+    line-height: 1.6;
+  }
+
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 0;
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+    display: flex; align-items: center; gap: 2rem;
+  }
+  .nav-brand { font-size: 1.25rem; font-weight: 700; color: var(--highlight); }
+  .nav-links { display: flex; gap: 1.25rem; }
+  .nav-links a { color: var(--muted); font-size: 0.9rem; }
+  .nav-links a:hover { color: var(--foreground); text-decoration: none; }
+  .nav-search {
+    margin-left: auto;
+    background: var(--elevated); border: 1px solid var(--border);
+    border-radius: 6px; padding: 0.4rem 0.75rem;
+    color: var(--muted); font-size: 0.875rem; width: 200px;
+  }
+
+  .breadcrumbs {
+    max-width: 1200px; margin: 0 auto; padding: 0.75rem 1rem;
+    font-size: 0.85rem; color: var(--muted);
+  }
+  .breadcrumbs a { color: var(--muted); }
+  .breadcrumbs a:hover { color: var(--link); }
+  .breadcrumbs span { margin: 0 0.4rem; }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem 3rem; }
+
+  h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.2rem; color: var(--highlight); margin-bottom: 0.75rem; }
+  h3 { font-size: 1rem; color: var(--highlight); margin-bottom: 0.5rem; }
+
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem; }
+
+  .info-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1.25rem;
+  }
+  .info-row { display: flex; justify-content: space-between; padding: 0.3rem 0; }
+  .info-label { color: var(--muted); }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { border-bottom: 2px solid var(--border); }
+  th { text-align: left; padding: 0.5rem; font-size: 0.85rem; color: var(--muted); font-weight: 600; }
+  td { padding: 0.5rem; border-bottom: 1px solid var(--border); }
+
+  .sources-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; }
+  .source-group { margin-bottom: 1rem; }
+  .source-group:last-child { margin-bottom: 0; }
+  .source-item { padding: 0.2rem 0; display: flex; justify-content: space-between; }
+  .source-chance { color: var(--muted); font-size: 0.9rem; }
+
+  .card-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem; margin-top: 1.5rem;
+  }
+  .card {
+    display: block; padding: 1.25rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; transition: border-color 0.15s;
+  }
+  .card:hover { border-color: var(--accent); text-decoration: none; }
+  .card h3 { color: var(--highlight); margin-bottom: 0.25rem; }
+  .card p { color: var(--muted); font-size: 0.9rem; }
+  .card .count { font-size: 0.8rem; color: var(--accent); }
+
+  .rarity-badge {
+    display: inline-block; padding: 0.1rem 0.5rem;
+    border-radius: 4px; font-size: 0.8rem; font-weight: 600;
+    background: rgba(255,255,255,0.06);
+  }
+
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 1.25rem; text-align: center;
+    color: var(--muted); font-size: 0.85rem;
+  }
+
+  .section { margin-top: 3rem; }
+  .section-label {
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent); margin-bottom: 1rem; padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  @media (max-width: 768px) {
+    .detail-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-brand">10-Man Codex</a>
+    <div class="nav-links">
+      <a href="#">Gathering</a>
+      <a href="#">Crafting</a>
+      <a href="#">Quests</a>
+      <a href="#">Dungeons</a>
+      <a href="#">Raids</a>
+      <a href="#">Items</a>
+      <a href="#">Classes</a>
+      <a href="#">Suffixes</a>
+      <a href="#">Mechanics</a>
+    </div>
+    <input class="nav-search" type="text" placeholder="Search items, quests...">
+  </div>
+</nav>
+
+<div class="breadcrumbs">
+  <a href="#">Home</a><span>/</span>
+  <a href="#">Items</a><span>/</span>
+  Shadowsteel Breastplate
+</div>
+
+<div class="container">
+  <h1 style="color: var(--epic);">Shadowsteel Breastplate</h1>
+  <span class="rarity-badge" style="color: var(--epic);">Epic</span>
+
+  <div class="detail-grid">
+    <div>
+      <div class="info-box">
+        <h2>Properties</h2>
+        <div class="info-row"><span class="info-label">Category</span><span>Equipment</span></div>
+        <div class="info-row"><span class="info-label">Rarity</span><span style="color: var(--epic);">Epic</span></div>
+        <div class="info-row"><span class="info-label">Item Level</span><span>45</span></div>
+        <div class="info-row"><span class="info-label">Slot</span><span>Chest</span></div>
+        <div class="info-row"><span class="info-label">Armor Type</span><span>Plate</span></div>
+        <div class="info-row"><span class="info-label">Combat Power</span><span>284</span></div>
+        <div class="info-row"><span class="info-label">Base Value</span><span>1,250g</span></div>
+        <div class="info-row"><span class="info-label">Max Stack</span><span>1</span></div>
+        <div style="margin-top: 0.75rem;">
+          <h3>Allowed Classes</h3>
+          <span style="color: var(--role-tank);">Warrior</span>,
+          <span style="color: var(--role-tank);">Paladin</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sources-panel">
+        <h2>Sources</h2>
+        <div class="source-group">
+          <h3>Dungeon Drops</h3>
+          <div class="source-item">
+            <a href="#">Shadowfang Keep</a>
+            <span class="source-chance">12%</span>
+          </div>
+          <div class="source-item">
+            <a href="#">The Iron Vault</a>
+            <span class="source-chance">8%</span>
+          </div>
+        </div>
+        <div class="source-group">
+          <h3>Raid Drops</h3>
+          <div class="source-item">
+            <a href="#">Dragon's Lair</a>
+            <span class="source-chance">5%</span>
+          </div>
+        </div>
+        <div class="source-group">
+          <h3>Crafted By</h3>
+          <div class="source-item">
+            <a href="#">Craft Shadowsteel Breastplate</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-box" style="margin-top: 1rem;">
+        <h2>Used In</h2>
+        <div class="source-item"><a href="#">Enchant Shadowsteel Breastplate</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Loot Table Preview</div>
+    <h2>Shadowfang Keep — Loot</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Rarity</th>
+          <th>Qty</th>
+          <th>Chance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="#" style="color: var(--legendary);">Blade of the Phoenix</a></td>
+          <td><span style="color: var(--legendary);">Legendary</span></td>
+          <td>1</td>
+          <td>2%</td>
+        </tr>
+        <tr>
+          <td><a href="#" style="color: var(--epic);">Shadowsteel Breastplate</a></td>
+          <td><span style="color: var(--epic);">Epic</span></td>
+          <td>1</td>
+          <td>12%</td>
+        </tr>
+        <tr>
+          <td><a href="#" style="color: var(--rare);">Runic Shield</a></td>
+          <td><span style="color: var(--rare);">Rare</span></td>
+          <td>1</td>
+          <td>18%</td>
+        </tr>
+        <tr>
+          <td><a href="#" style="color: var(--uncommon);">Iron Ore</a></td>
+          <td><span style="color: var(--uncommon);">Uncommon</span></td>
+          <td>2-5</td>
+          <td>45%</td>
+        </tr>
+        <tr>
+          <td><a href="#" style="color: var(--common);">Linen Scraps</a></td>
+          <td><span style="color: var(--common);">Common</span></td>
+          <td>1-3</td>
+          <td>65%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Home Page Category Cards</div>
+    <div class="card-grid">
+      <a href="#" class="card">
+        <h3>Gathering</h3>
+        <p>Gathering skills, nodes, and tools</p>
+        <span class="count">5 skills · 42 nodes</span>
+      </a>
+      <a href="#" class="card">
+        <h3>Crafting</h3>
+        <p>Crafting recipes by profession</p>
+        <span class="count">87 recipes</span>
+      </a>
+      <a href="#" class="card">
+        <h3>Quests</h3>
+        <p>Quest list by type and level</p>
+        <span class="count">65 quests</span>
+      </a>
+      <a href="#" class="card">
+        <h3>Dungeons</h3>
+        <p>Dungeon info, loot tables, requirements</p>
+        <span class="count">12 dungeons</span>
+      </a>
+      <a href="#" class="card">
+        <h3>Raids</h3>
+        <p>Raid encounters and exclusive loot</p>
+        <span class="count">4 raids</span>
+      </a>
+      <a href="#" class="card">
+        <h3>Items</h3>
+        <p>Equipment, materials, and consumables</p>
+        <span class="count">350 items</span>
+      </a>
+      <a href="#" class="card">
+        <h3>Classes</h3>
+        <p>Character classes, roles, and armor types</p>
+        <span class="count">6 classes</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  Data extracted from 10-Man Idle. Not affiliated with the game developers.<br>
+  <span style="font-size: 0.75rem; color: var(--accent);">Theme: Crimson Authority — midnight blue + crimson/amber, authoritative RPG database</span>
+</footer>
+
+</body>
+</html>

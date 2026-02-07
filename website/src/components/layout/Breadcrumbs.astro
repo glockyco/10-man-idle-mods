@@ -1,0 +1,19 @@
+---
+interface Props {
+  crumbs: { label: string; href?: string }[];
+}
+
+const { crumbs } = Astro.props;
+---
+
+<div class="max-w-[1200px] mx-auto px-4 py-3 text-sm text-muted">
+  {crumbs.map((crumb, i) => (
+    <>
+      {i > 0 && <span class="mx-1.5">/</span>}
+      {crumb.href
+        ? <a href={crumb.href} class="text-muted hover:text-link">{crumb.label}</a>
+        : <span class="text-foreground">{crumb.label}</span>
+      }
+    </>
+  ))}
+</div>
