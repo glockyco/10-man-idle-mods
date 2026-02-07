@@ -1,53 +1,37 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { query, hasDb } from "../../lib/db";
+import { getAllRaids } from "../../data/raids";
 
-interface Raid {
-  id: string;
-  name: string;
-  difficulty: string;
-  required_guild_level: number;
-  recommended_combat_power: number;
-  base_duration: number;
-  gold_reward: number;
-  experience_reward: number;
-}
-
-const raids = query<Raid>(
-  "SELECT * FROM raids ORDER BY required_guild_level, name"
-);
+const raids = getAllRaids();
 ---
 
 <BaseLayout title="Raids">
   <h1>Raids</h1>
-  {!hasDb && <p style="color: var(--text-dim);">Database not found. Run the DataExporter mod first.</p>}
-  {hasDb && (
-    <p style="color: var(--text-dim); margin: 0.5rem 0;">{raids.length} raids</p>
-    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
-      <thead>
-        <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-          <th style="padding: 0.5rem;">Name</th>
-          <th style="padding: 0.5rem;">Difficulty</th>
-          <th style="padding: 0.5rem;">Guild Lvl</th>
-          <th style="padding: 0.5rem;">Rec. CP</th>
-          <th style="padding: 0.5rem;">Duration</th>
-          <th style="padding: 0.5rem;">Gold</th>
-          <th style="padding: 0.5rem;">XP</th>
+  <p style="color: var(--text-dim); margin: 0.5rem 0;">{raids.length} raids</p>
+  <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+        <th style="padding: 0.5rem;">Name</th>
+        <th style="padding: 0.5rem;">Difficulty</th>
+        <th style="padding: 0.5rem;">Guild Lvl</th>
+        <th style="padding: 0.5rem;">Rec. CP</th>
+        <th style="padding: 0.5rem;">Duration</th>
+        <th style="padding: 0.5rem;">Gold</th>
+        <th style="padding: 0.5rem;">XP</th>
+      </tr>
+    </thead>
+    <tbody>
+      {raids.map((r) => (
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 0.5rem;"><a href={`/raids/${r.id}/`}>{r.name}</a></td>
+          <td style="padding: 0.5rem; color: var(--text-dim);">{r.difficulty}</td>
+          <td style="padding: 0.5rem;">{r.required_guild_level}</td>
+          <td style="padding: 0.5rem;">{r.recommended_combat_power}</td>
+          <td style="padding: 0.5rem; color: var(--text-dim);">{Math.round(r.base_duration)}s</td>
+          <td style="padding: 0.5rem;">{r.gold_reward}g</td>
+          <td style="padding: 0.5rem;">{r.experience_reward}</td>
         </tr>
-      </thead>
-      <tbody>
-        {raids.map((r) => (
-          <tr style="border-bottom: 1px solid var(--border);">
-            <td style="padding: 0.5rem;"><a href={`/raids/${r.id}/`}>{r.name}</a></td>
-            <td style="padding: 0.5rem; color: var(--text-dim);">{r.difficulty}</td>
-            <td style="padding: 0.5rem;">{r.required_guild_level}</td>
-            <td style="padding: 0.5rem;">{r.recommended_combat_power}</td>
-            <td style="padding: 0.5rem; color: var(--text-dim);">{Math.round(r.base_duration)}s</td>
-            <td style="padding: 0.5rem;">{r.gold_reward}g</td>
-            <td style="padding: 0.5rem;">{r.experience_reward}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )}
+      ))}
+    </tbody>
+  </table>
 </BaseLayout>

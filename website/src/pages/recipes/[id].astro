@@ -1,52 +1,25 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { query, queryOne } from "../../lib/db";
-
-interface Recipe {
-  id: string;
-  name: string;
-  skill: string;
-  required_level: number;
-  duration: number;
-  output_item_id: string;
-  output_quantity: number;
-  gold_cost: number;
-}
-
-interface OutputItem {
-  id: string;
-  name: string;
-  rarity: string;
-}
-
-interface Ingredient {
-  item_id: string;
-  item_name: string;
-  quantity: number;
-}
+import {
+  getAllRecipeIds,
+  getRecipe,
+  getRecipeIngredients,
+  getRecipeOutput,
+} from "../../data/recipes";
 
 export function getStaticPaths() {
-  const recipes = query<{ id: string }>("SELECT id FROM recipes");
-  return recipes.map((r) => ({ params: { id: r.id } }));
+  return getAllRecipeIds().map((id) => ({ params: { id } }));
 }
 
 const { id } = Astro.params;
-const recipe = queryOne<Recipe>("SELECT * FROM recipes WHERE id = ?", [id]);
+const recipe = getRecipe(id);
 
 if (!recipe) {
   return Astro.redirect("/recipes/");
 }
 
-const outputItem = recipe.output_item_id
-  ? queryOne<OutputItem>("SELECT id, name, rarity FROM items WHERE id = ?", [recipe.output_item_id])
-  : null;
-
-const ingredients = query<Ingredient>(
-  `SELECT ri.item_id, i.name as item_name, ri.quantity
-   FROM recipe_ingredients ri LEFT JOIN items i ON ri.item_id = i.id
-   WHERE ri.recipe_id = ?`,
-  [id]
-);
+const ingredients = getRecipeIngredients(id);
+const output = getRecipeOutput(recipe);
 
 const rarityColor: Record<string, string> = {
   Common: "var(--common)",
@@ -91,12 +64,30 @@ const rarityColor: Record<string, string> = {
     </div>
 
     <div>
-      {outputItem && (
+      {output.kind === "item" && (
         <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Output</h2>
         <p>
-          <a href={`/items/${outputItem.id}/`} style={`color: ${rarityColor[outputItem.rarity] ?? "var(--text)"}`}>
-            {outputItem.name}
+          <a href={output.url} style={`color: ${rarityColor[output.item.rarity] ?? "var(--text)"}`}>
+            {output.item.name}
           </a>
+          {recipe.output_quantity > 1 && (
+            <span style="color: var(--text-dim);"> x{recipe.output_quantity}</span>
+          )}
+        </p>
+      )}
+      {output.kind === "tool" && (
+        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Output</h2>
+        <p>
+          <a href={output.url}>{output.tool.name}</a>
+          {recipe.output_quantity > 1 && (
+            <span style="color: var(--text-dim);"> x{recipe.output_quantity}</span>
+          )}
+        </p>
+      )}
+      {output.kind === "unknown" && output.id && (
+        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Output</h2>
+        <p>
+          <span>{output.id}</span>
           {recipe.output_quantity > 1 && (
             <span style="color: var(--text-dim);"> x{recipe.output_quantity}</span>
           )}

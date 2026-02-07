@@ -1,42 +1,19 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { query, queryOne } from "../../lib/db";
-
-interface CharacterClass {
-  name: string;
-  armor_type: string;
-  roles: string;
-}
-
-interface ClassItem {
-  id: string;
-  name: string;
-  rarity: string;
-  item_level: number;
-  slot: string | null;
-  combat_power: number;
-}
+import { getAllClassNames, getClass, getClassEquipment } from "../../data/classes";
 
 export function getStaticPaths() {
-  const classes = query<{ name: string }>("SELECT name FROM character_classes");
-  return classes.map((c) => ({ params: { name: c.name } }));
+  return getAllClassNames().map((name) => ({ params: { name } }));
 }
 
 const { name } = Astro.params;
-const cls = queryOne<CharacterClass>("SELECT * FROM character_classes WHERE name = ?", [name]);
+const cls = getClass(name);
 
 if (!cls) {
   return Astro.redirect("/classes/");
 }
 
-const equipment = query<ClassItem>(
-  `SELECT i.id, i.name, i.rarity, i.item_level, i.slot, i.combat_power
-   FROM items i
-   JOIN item_allowed_classes iac ON i.id = iac.item_id
-   WHERE iac.class = ? AND i.category = 'Equipment'
-   ORDER BY i.item_level DESC, i.name`,
-  [name]
-);
+const equipment = getClassEquipment(name);
 
 const rarityColor: Record<string, string> = {
   Common: "var(--common)",

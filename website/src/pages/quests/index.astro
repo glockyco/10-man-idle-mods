@@ -1,22 +1,8 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { query, hasDb } from "../../lib/db";
+import { getAllQuests } from "../../data/quests";
 
-interface Quest {
-  id: string;
-  name: string;
-  type: string;
-  min_character_level: number;
-  recommended_combat_power: number;
-  base_duration: number;
-  gold_reward: number;
-  experience_reward: number;
-}
-
-const quests = query<Quest>(
-  "SELECT id, name, type, min_character_level, recommended_combat_power, base_duration, gold_reward, experience_reward FROM quests ORDER BY min_character_level, name"
-);
-
+const quests = getAllQuests();
 const types = [...new Set(quests.map((q) => q.type))].sort();
 const questsByType = types.map((t) => ({
   type: t,
@@ -26,38 +12,35 @@ const questsByType = types.map((t) => ({
 
 <BaseLayout title="Quests">
   <h1>Quests</h1>
-  {!hasDb && <p style="color: var(--text-dim);">Database not found. Run the DataExporter mod first.</p>}
-  {hasDb && (<>
-    <p style="color: var(--text-dim); margin: 0.5rem 0;">{quests.length} quests across {types.length} types</p>
+  <p style="color: var(--text-dim); margin: 0.5rem 0;">{quests.length} quests across {types.length} types</p>
 
-    {questsByType.map((group) => (
-      <div style="margin-top: 2rem;">
-        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">{group.type} ({group.quests.length})</h2>
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-              <th style="padding: 0.5rem;">Name</th>
-              <th style="padding: 0.5rem;">Level</th>
-              <th style="padding: 0.5rem;">Rec. CP</th>
-              <th style="padding: 0.5rem;">Duration</th>
-              <th style="padding: 0.5rem;">Gold</th>
-              <th style="padding: 0.5rem;">XP</th>
+  {questsByType.map((group) => (
+    <div style="margin-top: 2rem;">
+      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">{group.type} ({group.quests.length})</h2>
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+            <th style="padding: 0.5rem;">Name</th>
+            <th style="padding: 0.5rem;">Level</th>
+            <th style="padding: 0.5rem;">Rec. CP</th>
+            <th style="padding: 0.5rem;">Duration</th>
+            <th style="padding: 0.5rem;">Gold</th>
+            <th style="padding: 0.5rem;">XP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {group.quests.map((q) => (
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 0.5rem;"><a href={`/quests/${q.id}/`}>{q.name}</a></td>
+              <td style="padding: 0.5rem;">{q.min_character_level}</td>
+              <td style="padding: 0.5rem;">{q.recommended_combat_power}</td>
+              <td style="padding: 0.5rem; color: var(--text-dim);">{Math.round(q.base_duration)}s</td>
+              <td style="padding: 0.5rem;">{q.gold_reward}g</td>
+              <td style="padding: 0.5rem;">{q.experience_reward}</td>
             </tr>
-          </thead>
-          <tbody>
-            {group.quests.map((q) => (
-              <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 0.5rem;"><a href={`/quests/${q.id}/`}>{q.name}</a></td>
-                <td style="padding: 0.5rem;">{q.min_character_level}</td>
-                <td style="padding: 0.5rem;">{q.recommended_combat_power}</td>
-                <td style="padding: 0.5rem; color: var(--text-dim);">{Math.round(q.base_duration)}s</td>
-                <td style="padding: 0.5rem;">{q.gold_reward}g</td>
-                <td style="padding: 0.5rem;">{q.experience_reward}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    ))}
-  </>)}
+          ))}
+        </tbody>
+      </table>
+    </div>
+  ))}
 </BaseLayout>

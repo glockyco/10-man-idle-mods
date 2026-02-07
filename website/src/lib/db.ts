@@ -6,9 +6,13 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = path.resolve(__dirname, "..", "..", "..", "data", "10man-idle.db");
 
-let db: Database.Database | null = null;
+if (!fs.existsSync(dbPath)) {
+  throw new Error(
+    `Database not found at ${dbPath}. Run the DataExporter mod first.`,
+  );
+}
 
-export const hasDb = fs.existsSync(dbPath);
+let db: Database.Database | null = null;
 
 export function getDb(): Database.Database {
   if (!db) {
@@ -18,11 +22,12 @@ export function getDb(): Database.Database {
 }
 
 export function query<T>(sql: string, params: unknown[] = []): T[] {
-  if (!hasDb) return [];
   return getDb().prepare(sql).all(...params) as T[];
 }
 
-export function queryOne<T>(sql: string, params: unknown[] = []): T | undefined {
-  if (!hasDb) return undefined;
+export function queryOne<T>(
+  sql: string,
+  params: unknown[] = [],
+): T | undefined {
   return getDb().prepare(sql).get(...params) as T | undefined;
 }

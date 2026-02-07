@@ -1,70 +1,33 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { query } from "../../lib/db";
-
-interface GatheringNode {
-  id: string;
-  name: string;
-  skill: string;
-  required_level: number;
-  base_duration: number;
-}
-
-interface NodeDrop {
-  node_id: string;
-  item_id: string;
-  item_name: string;
-  item_rarity: string;
-  min_quantity: number;
-  max_quantity: number;
-  chance: number;
-}
-
-interface GatheringTool {
-  id: string;
-  name: string;
-  skill: string;
-  speed_bonus: number;
-}
+import {
+  getDistinctSkills,
+  getNodesBySkill,
+  getToolsBySkill,
+  getDropsBySkill,
+} from "../../data/gathering";
 
 export function getStaticPaths() {
-  const skills = query<{ skill: string }>("SELECT DISTINCT skill FROM gathering_nodes");
-  return skills.map((s) => ({ params: { skill: s.skill } }));
+  return getDistinctSkills().map((skill) => ({ params: { skill } }));
 }
 
 const { skill } = Astro.params;
 
-const nodes = query<GatheringNode>(
-  "SELECT * FROM gathering_nodes WHERE skill = ? ORDER BY required_level, name",
-  [skill]
-);
+const nodes = getNodesBySkill(skill);
 
 if (nodes.length === 0) {
   return Astro.redirect("/gathering/");
 }
 
-const drops = query<NodeDrop>(
-  `SELECT gd.node_id, gd.item_id, i.name as item_name, i.rarity as item_rarity,
-          gd.min_quantity, gd.max_quantity, gd.chance
-   FROM gathering_drops gd
-   LEFT JOIN items i ON gd.item_id = i.id
-   JOIN gathering_nodes gn ON gd.node_id = gn.id
-   WHERE gn.skill = ?
-   ORDER BY gd.node_id, gd.chance DESC`,
-  [skill]
-);
-
-const dropsByNode = new Map<string, NodeDrop[]>();
+const drops = getDropsBySkill(skill);
+const dropsByNode = new Map<string, typeof drops>();
 for (const d of drops) {
   const list = dropsByNode.get(d.node_id) ?? [];
   list.push(d);
   dropsByNode.set(d.node_id, list);
 }
 
-const tools = query<GatheringTool>(
-  "SELECT * FROM gathering_tools WHERE skill = ? ORDER BY speed_bonus",
-  [skill]
-);
+const tools = getToolsBySkill(skill);
 
 const rarityColor: Record<string, string> = {
   Common: "var(--common)",
@@ -124,8 +87,8 @@ const rarityColor: Record<string, string> = {
                 {nodeDrops.map((d) => (
                   <tr>
                     <td style="padding: 0.25rem 0.5rem;">
-                      <a href={`/items/${d.item_id}/`} style={`color: ${rarityColor[d.item_rarity] ?? "var(--text)"}`}>
-                        {d.item_name}
+                      <a href={`/items/${d.item_id}/`} style={`color: ${rarityColor[d.item_rarity ?? ""] ?? "var(--text)"}`}>
+                        {d.item_name ?? d.item_id}
                       </a>
                     </td>
                     <td style="padding: 0.25rem 0.5rem; color: var(--text-dim);">

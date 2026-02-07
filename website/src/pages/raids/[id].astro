@@ -1,48 +1,19 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { query, queryOne } from "../../lib/db";
-
-interface Raid {
-  id: string;
-  name: string;
-  description: string | null;
-  required_guild_level: number;
-  difficulty: string;
-  recommended_combat_power: number;
-  base_duration: number;
-  gold_reward: number;
-  experience_reward: number;
-}
-
-interface LootDrop {
-  item_id: string;
-  item_name: string;
-  item_rarity: string;
-  min_quantity: number;
-  max_quantity: number;
-  chance: number;
-}
+import { getAllRaidIds, getRaid, getRaidLoot } from "../../data/raids";
 
 export function getStaticPaths() {
-  const raids = query<{ id: string }>("SELECT id FROM raids");
-  return raids.map((r) => ({ params: { id: r.id } }));
+  return getAllRaidIds().map((id) => ({ params: { id } }));
 }
 
 const { id } = Astro.params;
-const raid = queryOne<Raid>("SELECT * FROM raids WHERE id = ?", [id]);
+const raid = getRaid(id);
 
 if (!raid) {
   return Astro.redirect("/raids/");
 }
 
-const loot = query<LootDrop>(
-  `SELECT rl.item_id, i.name as item_name, i.rarity as item_rarity,
-          rl.min_quantity, rl.max_quantity, rl.chance
-   FROM raid_loot rl LEFT JOIN items i ON rl.item_id = i.id
-   WHERE rl.raid_id = ?
-   ORDER BY rl.chance DESC`,
-  [id]
-);
+const loot = getRaidLoot(id);
 
 const rarityColor: Record<string, string> = {
   Common: "var(--common)",
@@ -94,8 +65,8 @@ const rarityColor: Record<string, string> = {
             {loot.map((l) => (
               <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 0.5rem;">
-                  <a href={`/items/${l.item_id}/`} style={`color: ${rarityColor[l.item_rarity] ?? "var(--text)"}`}>
-                    {l.item_name}
+                  <a href={`/items/${l.item_id}/`} style={`color: ${rarityColor[l.item_rarity ?? ""] ?? "var(--text)"}`}>
+                    {l.item_name ?? l.item_id}
                   </a>
                 </td>
                 <td style="padding: 0.5rem; color: var(--text-dim);">

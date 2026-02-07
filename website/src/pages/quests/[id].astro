@@ -1,48 +1,19 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { query, queryOne } from "../../lib/db";
-
-interface Quest {
-  id: string;
-  name: string;
-  description: string | null;
-  type: string;
-  min_character_level: number;
-  recommended_combat_power: number;
-  base_duration: number;
-  gold_reward: number;
-  experience_reward: number;
-}
-
-interface QuestReward {
-  item_id: string;
-  item_name: string;
-  item_rarity: string;
-  min_quantity: number;
-  max_quantity: number;
-  chance: number;
-}
+import { getAllQuestIds, getQuest, getQuestRewards } from "../../data/quests";
 
 export function getStaticPaths() {
-  const quests = query<{ id: string }>("SELECT id FROM quests");
-  return quests.map((q) => ({ params: { id: q.id } }));
+  return getAllQuestIds().map((id) => ({ params: { id } }));
 }
 
 const { id } = Astro.params;
-const quest = queryOne<Quest>("SELECT * FROM quests WHERE id = ?", [id]);
+const quest = getQuest(id);
 
 if (!quest) {
   return Astro.redirect("/quests/");
 }
 
-const rewards = query<QuestReward>(
-  `SELECT qr.item_id, i.name as item_name, i.rarity as item_rarity,
-          qr.min_quantity, qr.max_quantity, qr.chance
-   FROM quest_rewards qr LEFT JOIN items i ON qr.item_id = i.id
-   WHERE qr.quest_id = ?
-   ORDER BY qr.chance DESC`,
-  [id]
-);
+const rewards = getQuestRewards(id);
 
 const rarityColor: Record<string, string> = {
   Common: "var(--common)",
@@ -94,8 +65,8 @@ const rarityColor: Record<string, string> = {
             {rewards.map((r) => (
               <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 0.5rem;">
-                  <a href={`/items/${r.item_id}/`} style={`color: ${rarityColor[r.item_rarity] ?? "var(--text)"}`}>
-                    {r.item_name}
+                  <a href={`/items/${r.item_id}/`} style={`color: ${rarityColor[r.item_rarity ?? ""] ?? "var(--text)"}`}>
+                    {r.item_name ?? r.item_id}
                   </a>
                 </td>
                 <td style="padding: 0.5rem; color: var(--text-dim);">
