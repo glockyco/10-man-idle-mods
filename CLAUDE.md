@@ -5,8 +5,7 @@ Monorepo for game mods and a data wiki for "10-Man Idle"
 
 ## Repository layout
 
-- mods/          game mod framework + plugins
-- tools/         standalone data extraction tool
+- mods/          game mod framework + plugins (incl. data exporter)
 - data/          generated SQLite database (committed)
 - website/       Astro static wiki site
 - scripts/       build and extraction scripts
@@ -30,11 +29,13 @@ Or pass it on the command line:
 
     dotnet build -p:GameDir="E:\path\to\10-Man Idle"
 
-Data extraction:
+Data export (requires running the game once with mods installed):
 
-    dotnet run --project tools/DataExtractor
+    mods/run_modded.bat
+    scripts/export-data.bat
 
-Outputs data/10man-idle.db and copies to website/public/.
+The DataExporter mod writes Mods/export/10man-idle.db on first
+frame. The script copies it to data/ and website/public/.
 
 Website (requires Node.js + pnpm):
 
@@ -66,7 +67,7 @@ Conventional commits following cbea.ms guidelines:
 
 - Format: type(scope): subject
 - Types: feat, fix, chore, docs, refactor, test, build, ci
-- Scopes: mods, speed-mod, mod-loader, proxy, extractor, website
+- Scopes: mods, speed-mod, mod-loader, proxy, data-exporter, website
 - Subject line: imperative mood, no period, max 72 chars with prefix
 - Body: explain what and why (not how), wrap at 72 characters
 - Separate subject and body with a blank line

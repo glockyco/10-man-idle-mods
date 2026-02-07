@@ -40,6 +40,14 @@ copy "%SCRIPTDIR%src\SpeedMod\bin\Debug\net8.0\0Harmony.dll" "%GAMEDIR%\" >nul
 if not exist "%GAMEDIR%\Mods\plugins" mkdir "%GAMEDIR%\Mods\plugins"
 if not exist "%GAMEDIR%\Mods\config" mkdir "%GAMEDIR%\Mods\config"
 copy "%SCRIPTDIR%src\SpeedMod\bin\Debug\net8.0\SpeedMod.dll" "%GAMEDIR%\Mods\plugins\" >nul
+copy "%SCRIPTDIR%src\DataExporter\bin\Debug\net8.0\DataExporter.dll" "%GAMEDIR%\Mods\plugins\" >nul
+copy "%SCRIPTDIR%src\DataExporter\bin\Debug\net8.0\Microsoft.Data.Sqlite.dll" "%GAMEDIR%\Mods\plugins\" >nul
+copy "%SCRIPTDIR%src\DataExporter\bin\Debug\net8.0\SQLitePCLRaw.core.dll" "%GAMEDIR%\Mods\plugins\" >nul
+copy "%SCRIPTDIR%src\DataExporter\bin\Debug\net8.0\SQLitePCLRaw.batteries_v2.dll" "%GAMEDIR%\Mods\plugins\" >nul
+copy "%SCRIPTDIR%src\DataExporter\bin\Debug\net8.0\SQLitePCLRaw.provider.e_sqlite3.dll" "%GAMEDIR%\Mods\plugins\" >nul
+if exist "%SCRIPTDIR%src\DataExporter\bin\Debug\net8.0\runtimes" (
+    xcopy /s /y /q "%SCRIPTDIR%src\DataExporter\bin\Debug\net8.0\runtimes" "%GAMEDIR%\Mods\plugins\runtimes\" >nul
+)
 if not exist "%GAMEDIR%\Mods\config\SpeedMod.json" (
     copy "%SCRIPTDIR%config\SpeedMod.json" "%GAMEDIR%\Mods\config\" >nul
 )
