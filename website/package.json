@@ -9,12 +9,10 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/svelte": "^7.2.5",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.17.1",
     "astro-broken-links-checker": "^1.0.6",
     "better-sqlite3": "^12.6.2",
-    "svelte": "^5.50.0",
     "tailwindcss": "^4.1.18"
   },
   "pnpm": {
@@ -29,7 +27,6 @@
     "@commitlint/cli": "^20.4.1",
     "@commitlint/config-conventional": "^20.4.1",
     "@types/better-sqlite3": "^7.6.13",
-    "pagefind": "^1.4.0",
-    "svelte-check": "^4.3.6"
+    "pagefind": "^1.4.0"
   }
 }

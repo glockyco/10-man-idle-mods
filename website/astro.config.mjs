@@ -3,7 +3,6 @@ import { defineConfig } from "astro/config";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import svelte from "@astrojs/svelte";
 import tailwindcss from "@tailwindcss/vite";
 import astroBrokenLinksChecker from "astro-broken-links-checker";
 
@@ -38,7 +37,7 @@ function pagefindDevServer() {
 }
 
 export default defineConfig({
-  integrations: [svelte(), astroBrokenLinksChecker({ throwError: true })],
+  integrations: [astroBrokenLinksChecker({ throwError: true })],
   vite: {
     plugins: [tailwindcss(), pagefindDevServer()],
   },
