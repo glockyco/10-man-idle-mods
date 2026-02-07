@@ -286,7 +286,6 @@ function copyDatabase(gameDir) {
 
   const targets = [
     join(ROOT, "data", "10man-idle.db"),
-    join(ROOT, "website", "public", "10man-idle.db"),
   ];
 
   for (const dest of targets) {
@@ -320,6 +319,8 @@ function verify() {
     "raids",
     "quests",
     "classes",
+    "suffixes",
+    "mechanics",
   ];
 
   const checks = [];

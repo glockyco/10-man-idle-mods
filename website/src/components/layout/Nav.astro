@@ -1,4 +1,6 @@
 ---
+import SearchWidget from "../search/SearchWidget.astro";
+
 const navLinks = [
   { href: "/gathering/", label: "Gathering" },
   { href: "/recipes/", label: "Crafting" },
@@ -27,6 +29,8 @@ const navLinks = [
         </a>
       ))}
     </div>
-    <div id="search-widget" class="ml-auto"></div>
+    <div class="ml-auto">
+      <SearchWidget />
+    </div>
   </div>
 </nav>

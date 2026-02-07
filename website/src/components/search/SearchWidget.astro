@@ -1,0 +1,176 @@
+---
+/**
+ * Pagefind search widget with a server-rendered input.
+ *
+ * The <input> is in the initial HTML so there's no layout shift.
+ * Pagefind's raw search API is loaded on first focus and used to
+ * populate a results dropdown as the user types.
+ */
+---
+
+<div class="search-wrapper">
+  <input
+    id="search-input"
+    type="search"
+    placeholder="Search the codex..."
+    autocomplete="off"
+  />
+  <div id="search-results" class="search-results" hidden></div>
+</div>
+
+<script is:inline>
+  (function () {
+    var input = document.getElementById("search-input");
+    var resultsEl = document.getElementById("search-results");
+    var pagefind = null;
+    var debounceTimer = null;
+
+    function loadPagefind() {
+      if (pagefind) return Promise.resolve(pagefind);
+      return import("/pagefind/pagefind.js")
+        .then(function (pf) {
+          pagefind = pf;
+          return pf.options({ excerptLength: 20 });
+        })
+        .then(function () { return pagefind; })
+        .catch(function () { pagefind = null; return null; });
+    }
+
+    function doSearch() {
+      var term = input.value.trim();
+      if (!term) {
+        resultsEl.hidden = true;
+        return;
+      }
+      loadPagefind().then(function (pf) {
+        if (!pf) return;
+        return pf.search(term);
+      }).then(function (search) {
+        if (!search) return;
+        var first = search.results.slice(0, 6);
+        return Promise.all(first.map(function (r) { return r.data(); }))
+          .then(function (items) { renderResults(items, search.results.length); });
+      });
+    }
+
+    function renderResults(items, total) {
+      if (!items.length) {
+        resultsEl.innerHTML = '<p class="search-empty">No results found.</p>';
+        resultsEl.hidden = false;
+        return;
+      }
+      var html = '<p class="search-count">' + total.toLocaleString() + " results</p><ul>";
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var title = (item.meta && item.meta.title) || "Untitled";
+        html += '<li class="search-item">'
+          + '<a class="search-item-link" href="' + item.url + '">' + title + "</a>"
+          + '<p class="search-item-excerpt">' + item.excerpt + "</p>"
+          + "</li>";
+      }
+      html += "</ul>";
+      resultsEl.innerHTML = html;
+      resultsEl.hidden = false;
+    }
+
+    input.addEventListener("focus", function () { loadPagefind(); }, { once: true });
+
+    input.addEventListener("input", function () {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(doSearch, 200);
+    });
+
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest(".search-wrapper")) resultsEl.hidden = true;
+    });
+
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        resultsEl.hidden = true;
+        input.blur();
+      }
+    });
+  })();
+</script>
+
+<style is:global>
+  .search-wrapper {
+    position: relative;
+  }
+
+  #search-input {
+    width: 260px;
+    height: 36px;
+    padding: 0 12px;
+    font-size: 14px;
+    background: var(--color-elevated);
+    color: var(--color-foreground);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    outline: none;
+    font-family: inherit;
+  }
+
+  #search-input::placeholder {
+    color: var(--color-muted);
+  }
+
+  #search-input:focus {
+    border-color: var(--color-accent);
+  }
+
+  .search-results {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    width: 450px;
+    max-height: 70vh;
+    overflow-y: auto;
+    z-index: 100;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    padding: 12px 16px;
+  }
+
+  .search-count {
+    font-size: 13px;
+    color: var(--color-muted);
+    margin-bottom: 8px;
+  }
+
+  .search-empty {
+    font-size: 14px;
+    color: var(--color-muted);
+  }
+
+  .search-results ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .search-item {
+    padding: 10px 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .search-item-link {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-link);
+  }
+
+  .search-item-excerpt {
+    font-size: 13px;
+    color: var(--color-muted);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  .search-item-excerpt mark {
+    background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+    color: var(--color-foreground);
+  }
+</style>
