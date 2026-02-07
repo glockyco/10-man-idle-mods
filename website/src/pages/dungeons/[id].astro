@@ -1,6 +1,9 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import InfoBox from "../../components/ui/InfoBox.astro";
+import LootTable from "../../components/ui/LootTable.astro";
 import { getAllDungeonIds, getDungeon, getDungeonLoot } from "../../data/dungeons";
+import { formatDuration, formatGold } from "../../data/helpers";
 
 export function getStaticPaths() {
   return getAllDungeonIds().map((id) => ({ params: { id } }));
@@ -15,69 +18,36 @@ if (!dungeon) {
 
 const loot = getDungeonLoot(id);
 
-const rarityColor: Record<string, string> = {
-  Common: "var(--common)",
-  Uncommon: "var(--uncommon)",
-  Rare: "var(--rare)",
-  Epic: "var(--epic)",
-  Legendary: "var(--legendary)",
-};
+const crumbs = [
+  { label: "Home", href: "/" },
+  { label: "Dungeons", href: "/dungeons/" },
+  { label: dungeon.name },
+];
+
+const requirementRows = [
+  { label: "Difficulty", value: dungeon.difficulty },
+  { label: "Guild Level", value: String(dungeon.required_guild_level) },
+  { label: "Rec. Combat Power", value: String(dungeon.recommended_combat_power) },
+  { label: "Duration", value: formatDuration(dungeon.base_duration) },
+];
+
+const rewardRows = [
+  { label: "Gold", value: formatGold(dungeon.gold_reward) },
+  { label: "Experience", value: String(dungeon.experience_reward) },
+];
 ---
 
-<BaseLayout title={dungeon.name}>
-  <p><a href="/dungeons/">&larr; All Dungeons</a></p>
-  <h1 style="margin-top: 0.5rem;">{dungeon.name}</h1>
-  {dungeon.description && <p style="color: var(--text-dim); margin-top: 0.5rem;">{dungeon.description}</p>}
+<BaseLayout title={dungeon.name} crumbs={crumbs}>
+  <h1 class="text-2xl font-bold">{dungeon.name}</h1>
+  {dungeon.description && <p class="text-muted mt-2">{dungeon.description}</p>}
 
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
-    <div>
-      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Requirements</h2>
-      <table style="width: 100%;">
-        <tbody>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Difficulty</td><td>{dungeon.difficulty}</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Guild Level</td><td>{dungeon.required_guild_level}</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Rec. Combat Power</td><td>{dungeon.recommended_combat_power}</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Duration</td><td>{Math.round(dungeon.base_duration)}s</td></tr>
-        </tbody>
-      </table>
-
-      <h2 style="color: var(--text-highlight); margin-top: 1.5rem; margin-bottom: 0.5rem;">Rewards</h2>
-      <table style="width: 100%;">
-        <tbody>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Gold</td><td>{dungeon.gold_reward}g</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Experience</td><td>{dungeon.experience_reward}</td></tr>
-        </tbody>
-      </table>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+    <div class="space-y-6">
+      <InfoBox title="Requirements" rows={requirementRows} />
+      <InfoBox title="Rewards" rows={rewardRows} />
     </div>
-
     <div>
-      {loot.length > 0 && (
-        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Loot Table</h2>
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-              <th style="padding: 0.5rem;">Item</th>
-              <th style="padding: 0.5rem;">Qty</th>
-              <th style="padding: 0.5rem;">Chance</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loot.map((l) => (
-              <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 0.5rem;">
-                  <a href={`/items/${l.item_id}/`} style={`color: ${rarityColor[l.item_rarity ?? ""] ?? "var(--text)"}`}>
-                    {l.item_name ?? l.item_id}
-                  </a>
-                </td>
-                <td style="padding: 0.5rem; color: var(--text-dim);">
-                  {l.min_quantity === l.max_quantity ? l.min_quantity : `${l.min_quantity}-${l.max_quantity}`}
-                </td>
-                <td style="padding: 0.5rem;">{(l.chance * 100).toFixed(0)}%</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      <LootTable title="Loot Table" drops={loot} />
     </div>
   </div>
 </BaseLayout>

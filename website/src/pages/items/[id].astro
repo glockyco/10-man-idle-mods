@@ -1,5 +1,8 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import InfoBox from "../../components/ui/InfoBox.astro";
+import SourcesList from "../../components/ui/SourcesList.astro";
+import RarityBadge from "../../components/ui/RarityBadge.astro";
 import {
   getAllItemIds,
   getAllToolIds,
@@ -10,6 +13,11 @@ import {
   getRecipesUsingItem,
   getItemSources,
 } from "../../data/items";
+import {
+  rarityClass,
+  formatSpeedBonus,
+  formatGold,
+} from "../../data/helpers";
 
 export function getStaticPaths() {
   const items = getAllItemIds();
@@ -30,106 +38,86 @@ const classes = item ? getItemClasses(id) : [];
 const recipesUsedIn = item ? getRecipesUsingItem(id) : [];
 const allSources = item ? getItemSources(id) : [];
 
-const rarityColor: Record<string, string> = {
-  Common: "var(--common)",
-  Uncommon: "var(--uncommon)",
-  Rare: "var(--rare)",
-  Epic: "var(--epic)",
-  Legendary: "var(--legendary)",
-};
+const itemRows = item ? [
+  { label: "Category", value: item.category },
+  { label: "Rarity", value: item.rarity, class: rarityClass(item.rarity) },
+  { label: "Item Level", value: String(item.item_level) },
+  ...(item.slot ? [{ label: "Slot", value: item.slot }] : []),
+  ...(item.armor_type ? [{ label: "Armor Type", value: item.armor_type }] : []),
+  ...(item.combat_power > 0 ? [{ label: "Combat Power", value: String(item.combat_power) }] : []),
+  ...(item.material_type ? [{ label: "Material", value: item.material_type }] : []),
+  { label: "Base Value", value: formatGold(item.base_value) },
+  { label: "Max Stack", value: String(item.max_stack_size) },
+  ...(item.consumable_type ? [{ label: "Consumable", value: item.consumable_type }] : []),
+] : [];
+
+const toolRows = tool ? [
+  { label: "Category", value: "Gathering Tool" },
+  { label: "Skill", value: tool.skill },
+  { label: "Speed Bonus", value: formatSpeedBonus(tool.speed_bonus) },
+] : [];
+
+const crumbs = tool
+  ? [{ label: "Home", href: "/" }, { label: "Gathering", href: "/gathering/" }, { label: tool.skill, href: `/gathering/${tool.skill}/` }, { label: tool.name }]
+  : [{ label: "Home", href: "/" }, { label: "Items", href: "/items/" }, { label: item!.name }];
 ---
 
-{tool ? (
-<BaseLayout title={tool.name}>
-  <p><a href={`/gathering/${tool.skill}/`}>&larr; {tool.skill}</a></p>
-  <h1 style="margin-top: 0.5rem;">{tool.name}</h1>
+<BaseLayout title={tool?.name ?? item!.name} crumbs={crumbs}>
+  {tool ? (
+    <h1 class="text-2xl font-bold mt-2">{tool.name}</h1>
 
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
-    <div>
-      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Properties</h2>
-      <table style="width: 100%;">
-        <tbody>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Category</td><td>Gathering Tool</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Skill</td><td><a href={`/gathering/${tool.skill}/`}>{tool.skill}</a></td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Speed Bonus</td><td>+{(tool.speed_bonus * 100).toFixed(0)}%</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+      <InfoBox title="Properties" rows={toolRows}>
+        <div class="mt-2">
+          <a href={`/gathering/${tool.skill}/`} class="text-sm">{tool.skill} &rarr;</a>
+        </div>
+      </InfoBox>
 
-    <div>
-      {recipeOutput.length > 0 && (
-        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Crafted By</h2>
-        <ul style="list-style: none;">
-          {recipeOutput.map((r) => (
-            <li><a href={`/recipes/${r.id}/`}>{r.name}</a></li>
-          ))}
-        </ul>
-      )}
+      <div>
+        {recipeOutput.length > 0 && (
+          <div class="bg-surface border border-border rounded-lg p-5">
+            <h2 class="text-lg text-highlight mb-3">Crafted By</h2>
+            <ul class="space-y-1">
+              {recipeOutput.map((r) => (
+                <li><a href={`/recipes/${r.id}/`}>{r.name}</a></li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
+  ) : (
+    <>
+      <h1 class={`text-2xl font-bold mt-2 ${rarityClass(item!.rarity)}`}>{item!.name}</h1>
+      <RarityBadge rarity={item!.rarity} />
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+        <div>
+          <InfoBox title="Properties" rows={itemRows}>
+            {classes.length > 0 && (
+              <div class="mt-3 pt-3 border-t border-border">
+                <h3 class="text-sm text-highlight mb-1">Allowed Classes</h3>
+                <p>{classes.join(", ")}</p>
+              </div>
+            )}
+          </InfoBox>
+        </div>
+
+        <div class="space-y-4">
+          <SourcesList sources={allSources} />
+
+          {recipesUsedIn.length > 0 && (
+            <div class="bg-surface border border-border rounded-lg p-5">
+              <h2 class="text-lg text-highlight mb-3">Used In</h2>
+              <ul class="space-y-1">
+                {recipesUsedIn.map((r) => (
+                  <li><a href={`/recipes/${r.recipe_id}/`}>{r.recipe_name}</a></li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  )}
 </BaseLayout>
-) : (
-<BaseLayout title={item!.name}>
-  <p><a href="/items/">&larr; All Items</a></p>
-  <h1 style={`color: ${rarityColor[item!.rarity] ?? "var(--text)"}; margin-top: 0.5rem;`}>{item!.name}</h1>
-
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
-    <div>
-      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Properties</h2>
-      <table style="width: 100%;">
-        <tbody>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Category</td><td>{item!.category}</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Rarity</td><td style={`color: ${rarityColor[item!.rarity]}`}>{item!.rarity}</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Item Level</td><td>{item!.item_level}</td></tr>
-          {item!.slot && <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Slot</td><td>{item!.slot}</td></tr>}
-          {item!.armor_type && <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Armor Type</td><td>{item!.armor_type}</td></tr>}
-          {item!.combat_power > 0 && <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Combat Power</td><td>{item!.combat_power}</td></tr>}
-          {item!.material_type && <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Material</td><td>{item!.material_type}</td></tr>}
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Base Value</td><td>{item!.base_value}g</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Max Stack</td><td>{item!.max_stack_size}</td></tr>
-          {item!.consumable_type && <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Consumable</td><td>{item!.consumable_type}</td></tr>}
-        </tbody>
-      </table>
-
-      {classes.length > 0 && (
-        <h3 style="color: var(--text-highlight); margin-top: 1rem;">Allowed Classes</h3>
-        <p>{classes.join(", ")}</p>
-      )}
-    </div>
-
-    <div>
-      {allSources.length > 0 && (
-        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Found In</h2>
-        <ul style="list-style: none;">
-          {allSources.filter((s) => s.source_type !== "recipe").map((s) => (
-            <li style="padding: 0.25rem 0;">
-              <a href={s.url}>{s.source_name}</a>
-              {s.chance != null && (
-                <span style="color: var(--text-dim);"> ({(s.chance * 100).toFixed(0)}%)</span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {recipeOutput.length > 0 && (
-        <h2 style="color: var(--text-highlight); margin-top: 1rem; margin-bottom: 0.5rem;">Crafted By</h2>
-        <ul style="list-style: none;">
-          {recipeOutput.map((r) => (
-            <li><a href={`/recipes/${r.id}/`}>{r.name}</a></li>
-          ))}
-        </ul>
-      )}
-
-      {recipesUsedIn.length > 0 && (
-        <h2 style="color: var(--text-highlight); margin-top: 1rem; margin-bottom: 0.5rem;">Used In</h2>
-        <ul style="list-style: none;">
-          {recipesUsedIn.map((r) => (
-            <li><a href={`/recipes/${r.recipe_id}/`}>{r.recipe_name}</a></li>
-          ))}
-        </ul>
-      )}
-    </div>
-  </div>
-</BaseLayout>
-)}

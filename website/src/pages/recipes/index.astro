@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ItemLink from "../../components/ui/ItemLink.astro";
 import { getAllRecipes } from "../../data/recipes";
+import { recipeUrl, formatGold } from "../../data/helpers";
 
 const recipes = getAllRecipes();
 const skills = [...new Set(recipes.map((r) => r.skill))].sort();
@@ -8,41 +10,46 @@ const recipesBySkill = skills.map((s) => ({
   skill: s,
   recipes: recipes.filter((r) => r.skill === s),
 }));
+
+const crumbs = [
+  { label: "Home", href: "/" },
+  { label: "Recipes" },
+];
 ---
 
-<BaseLayout title="Recipes">
-  <h1>Recipes</h1>
-  <p style="color: var(--text-dim); margin: 0.5rem 0;">{recipes.length} recipes across {skills.length} professions</p>
+<BaseLayout title="Recipes" crumbs={crumbs}>
+  <h1 class="text-2xl font-bold">Recipes</h1>
+  <p class="text-muted mt-2">{recipes.length} recipes across {skills.length} professions</p>
 
   {recipesBySkill.map((group) => (
-    <div style="margin-top: 2rem;">
-      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">{group.skill} ({group.recipes.length})</h2>
-      <table style="width: 100%; border-collapse: collapse;">
+    <div class="mt-8">
+      <h2 class="text-lg text-highlight mb-3">{group.skill} ({group.recipes.length})</h2>
+      <table class="w-full border-collapse">
         <thead>
-          <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-            <th style="padding: 0.5rem;">Recipe</th>
-            <th style="padding: 0.5rem;">Level</th>
-            <th style="padding: 0.5rem;">Output</th>
-            <th style="padding: 0.5rem;">Qty</th>
-            <th style="padding: 0.5rem;">Gold Cost</th>
+          <tr class="border-b-2 border-border text-left">
+            <th class="p-2 text-sm text-muted font-semibold">Recipe</th>
+            <th class="p-2 text-sm text-muted font-semibold">Level</th>
+            <th class="p-2 text-sm text-muted font-semibold">Output</th>
+            <th class="p-2 text-sm text-muted font-semibold">Qty</th>
+            <th class="p-2 text-sm text-muted font-semibold">Gold Cost</th>
           </tr>
         </thead>
         <tbody>
           {group.recipes.map((r) => (
-            <tr style="border-bottom: 1px solid var(--border);">
-              <td style="padding: 0.5rem;">
-                <a href={`/recipes/${r.id}/`}>{r.name}</a>
+            <tr class="border-b border-border">
+              <td class="p-2">
+                <a href={recipeUrl(r.id)}>{r.name}</a>
               </td>
-              <td style="padding: 0.5rem;">{r.required_level}</td>
-              <td style="padding: 0.5rem;">
+              <td class="p-2">{r.required_level}</td>
+              <td class="p-2">
                 {r.output_item_id ? (
-                  <a href={`/items/${r.output_item_id}/`}>{r.output_item_name ?? r.output_item_id}</a>
+                  <ItemLink id={r.output_item_id} name={r.output_item_name} />
                 ) : (
-                  <span style="color: var(--text-dim);">—</span>
+                  <span class="text-muted">&mdash;</span>
                 )}
               </td>
-              <td style="padding: 0.5rem;">{r.output_quantity}</td>
-              <td style="padding: 0.5rem;">{r.gold_cost}g</td>
+              <td class="p-2">{r.output_quantity}</td>
+              <td class="p-2">{formatGold(r.gold_cost)}</td>
             </tr>
           ))}
         </tbody>

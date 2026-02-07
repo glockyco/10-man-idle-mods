@@ -1,32 +1,30 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import RoleBadge from "../../components/ui/RoleBadge.astro";
 import { getAllClasses } from "../../data/classes";
+import { classUrl } from "../../data/helpers";
 
 const classes = getAllClasses();
 
-const roleColor: Record<string, string> = {
-  Tank: "var(--rare)",
-  Healer: "var(--uncommon)",
-  DPS: "var(--accent)",
-};
+const crumbs = [
+  { label: "Home", href: "/" },
+  { label: "Classes" },
+];
 ---
 
-<BaseLayout title="Classes">
-  <h1>Classes</h1>
-  <p style="color: var(--text-dim); margin: 0.5rem 0;">{classes.length} classes</p>
-  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+<BaseLayout title="Classes" crumbs={crumbs}>
+  <h1 class="text-2xl font-bold">Classes</h1>
+  <p class="text-muted mt-2">{classes.length} classes</p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
     {classes.map((c) => (
-      <a href={`/classes/${c.name}/`} style="display: block; padding: 1.5rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;">
-        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">{c.name}</h2>
-        <p style="color: var(--text-dim); margin-bottom: 0.25rem;">Armor: {c.armor_type}</p>
-        <p>
-          {c.roles.split(",").map((role, i) => (
-            <>
-              {i > 0 && <span style="color: var(--text-dim);"> / </span>}
-              <span style={`color: ${roleColor[role] ?? "var(--text)"}`}>{role}</span>
-            </>
+      <a href={classUrl(c.name)} class="block p-5 bg-surface border border-border rounded-lg hover:border-highlight hover:no-underline transition-colors">
+        <h2 class="text-highlight mb-1">{c.name}</h2>
+        <p class="text-muted text-sm mb-2">Armor: {c.armor_type}</p>
+        <div class="flex gap-2">
+          {c.roles.split(",").map((role) => (
+            <RoleBadge role={role} />
           ))}
-        </p>
+        </div>
       </a>
     ))}
   </div>

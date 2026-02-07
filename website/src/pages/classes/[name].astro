@@ -1,5 +1,8 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import InfoBox from "../../components/ui/InfoBox.astro";
+import RoleBadge from "../../components/ui/RoleBadge.astro";
+import ItemLink from "../../components/ui/ItemLink.astro";
 import { getAllClassNames, getClass, getClassEquipment } from "../../data/classes";
 
 export function getStaticPaths() {
@@ -15,72 +18,60 @@ if (!cls) {
 
 const equipment = getClassEquipment(name);
 
-const rarityColor: Record<string, string> = {
-  Common: "var(--common)",
-  Uncommon: "var(--uncommon)",
-  Rare: "var(--rare)",
-  Epic: "var(--epic)",
-  Legendary: "var(--legendary)",
-};
+const crumbs = [
+  { label: "Home", href: "/" },
+  { label: "Classes", href: "/classes/" },
+  { label: cls.name },
+];
 
-const roleColor: Record<string, string> = {
-  Tank: "var(--rare)",
-  Healer: "var(--uncommon)",
-  DPS: "var(--accent)",
-};
+const overviewRows = [
+  { label: "Armor Type", value: cls.armor_type },
+];
 ---
 
-<BaseLayout title={cls.name}>
-  <p><a href="/classes/">&larr; All Classes</a></p>
-  <h1 style="margin-top: 0.5rem;">{cls.name}</h1>
+<BaseLayout title={cls.name} crumbs={crumbs}>
+  <h1 class="text-2xl font-bold">{cls.name}</h1>
 
-  <div style="margin-top: 1.5rem;">
-    <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Overview</h2>
-    <table style="width: auto;">
-      <tbody>
-        <tr><td style="color: var(--text-dim); padding: 0.25rem 1rem 0.25rem 0;">Armor Type</td><td>{cls.armor_type}</td></tr>
-        <tr>
-          <td style="color: var(--text-dim); padding: 0.25rem 1rem 0.25rem 0;">Roles</td>
-          <td>
-            {cls.roles.split(",").map((role, i) => (
-              <>
-                {i > 0 && ", "}
-                <span style={`color: ${roleColor[role] ?? "var(--text)"}`}>{role}</span>
-              </>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+    <div>
+      <InfoBox title="Overview" rows={overviewRows}>
+        <div class="flex justify-between py-1">
+          <span class="text-muted">Roles</span>
+          <span class="flex gap-2">
+            {cls.roles.split(",").map((role) => (
+              <RoleBadge role={role} />
             ))}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  {equipment.length > 0 && (
-    <div style="margin-top: 2rem;">
-      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Equipment ({equipment.length})</h2>
-      <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-          <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-            <th style="padding: 0.5rem;">Name</th>
-            <th style="padding: 0.5rem;">Level</th>
-            <th style="padding: 0.5rem;">Slot</th>
-            <th style="padding: 0.5rem;">CP</th>
-          </tr>
-        </thead>
-        <tbody>
-          {equipment.map((item) => (
-            <tr style="border-bottom: 1px solid var(--border);">
-              <td style="padding: 0.5rem;">
-                <a href={`/items/${item.id}/`} style={`color: ${rarityColor[item.rarity] ?? "var(--text)"}`}>
-                  {item.name}
-                </a>
-              </td>
-              <td style="padding: 0.5rem;">{item.item_level}</td>
-              <td style="padding: 0.5rem; color: var(--text-dim);">{item.slot ?? "—"}</td>
-              <td style="padding: 0.5rem;">{item.combat_power || "—"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          </span>
+        </div>
+      </InfoBox>
     </div>
-  )}
+
+    {equipment.length > 0 && (
+      <div>
+        <h2 class="text-lg text-highlight mb-3">Equipment ({equipment.length})</h2>
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b-2 border-border text-left">
+              <th class="p-2 text-sm text-muted font-semibold">Name</th>
+              <th class="p-2 text-sm text-muted font-semibold">Level</th>
+              <th class="p-2 text-sm text-muted font-semibold">Slot</th>
+              <th class="p-2 text-sm text-muted font-semibold">CP</th>
+            </tr>
+          </thead>
+          <tbody>
+            {equipment.map((item) => (
+              <tr class="border-b border-border">
+                <td class="p-2">
+                  <ItemLink id={item.id} name={item.name} rarity={item.rarity} />
+                </td>
+                <td class="p-2">{item.item_level}</td>
+                <td class="p-2 text-muted">{item.slot ?? "\u2014"}</td>
+                <td class="p-2">{item.combat_power || "\u2014"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </div>
 </BaseLayout>

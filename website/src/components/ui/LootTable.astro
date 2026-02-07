@@ -1,0 +1,38 @@
+---
+import ItemLink from "./ItemLink.astro";
+import { formatQuantityRange, formatChance } from "../../data/helpers";
+import type { LootDrop } from "../../data/types";
+
+interface Props {
+  title: string;
+  drops: LootDrop[];
+}
+
+const { title, drops } = Astro.props;
+---
+
+{drops.length > 0 && (
+  <div>
+    <h2 class="text-lg text-highlight mb-3">{title}</h2>
+    <table class="w-full border-collapse">
+      <thead>
+        <tr class="border-b-2 border-border text-left">
+          <th class="p-2 text-sm text-muted font-semibold">Item</th>
+          <th class="p-2 text-sm text-muted font-semibold">Qty</th>
+          <th class="p-2 text-sm text-muted font-semibold">Chance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {drops.map((drop) => (
+          <tr class="border-b border-border">
+            <td class="p-2">
+              <ItemLink id={drop.item_id} name={drop.item_name} rarity={drop.item_rarity} />
+            </td>
+            <td class="p-2 text-muted">{formatQuantityRange(drop.min_quantity, drop.max_quantity)}</td>
+            <td class="p-2">{formatChance(drop.chance)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}

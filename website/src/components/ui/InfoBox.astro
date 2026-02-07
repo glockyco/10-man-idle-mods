@@ -1,0 +1,19 @@
+---
+interface Props {
+  title: string;
+  rows: { label: string; value: string; class?: string }[];
+}
+
+const { title, rows } = Astro.props;
+---
+
+<div class="bg-surface border border-border rounded-lg p-5">
+  <h2 class="text-lg text-highlight mb-3">{title}</h2>
+  {rows.map((row) => (
+    <div class="flex justify-between py-1">
+      <span class="text-muted">{row.label}</span>
+      <span class={row.class ?? ""}>{row.value}</span>
+    </div>
+  ))}
+  <slot />
+</div>

@@ -1,0 +1,44 @@
+---
+import { formatChance } from "../../data/helpers";
+import type { ItemSource } from "../../data/types";
+
+interface Props {
+  sources: ItemSource[];
+}
+
+const { sources } = Astro.props;
+
+const sourceLabels: Record<string, string> = {
+  dungeon: "Dungeon Drops",
+  raid: "Raid Drops",
+  gathering: "Gathering",
+  quest: "Quest Rewards",
+  recipe: "Crafted By",
+};
+
+const grouped = new Map<string, ItemSource[]>();
+for (const s of sources) {
+  const list = grouped.get(s.source_type) ?? [];
+  list.push(s);
+  grouped.set(s.source_type, list);
+}
+---
+
+{sources.length > 0 && (
+  <div class="bg-surface border border-border rounded-lg p-5">
+    <h2 class="text-lg text-highlight mb-3">Sources</h2>
+    {[...grouped.entries()].map(([sourceType, items]) => (
+      <div class="mb-4 last:mb-0">
+        <h3 class="text-sm text-highlight mb-1">{sourceLabels[sourceType] ?? sourceType}</h3>
+        {items.map((s) => (
+          <div class="flex justify-between py-0.5">
+            <a href={s.url}>{s.source_name}</a>
+            {s.chance != null && (
+              <span class="text-muted text-sm">{formatChance(s.chance)}</span>
+            )}
+          </div>
+        ))}
+      </div>
+    ))}
+  </div>
+)}

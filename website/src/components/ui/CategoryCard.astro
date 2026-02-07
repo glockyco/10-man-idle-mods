@@ -1,0 +1,16 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  description: string;
+  count?: string;
+}
+
+const { href, title, description, count } = Astro.props;
+---
+
+<a href={href} class="block p-5 bg-surface border border-border rounded-lg hover:border-highlight hover:no-underline transition-colors">
+  <h3 class="text-highlight mb-1">{title}</h3>
+  <p class="text-muted text-sm">{description}</p>
+  {count && <span class="text-xs text-accent">{count}</span>}
+</a>

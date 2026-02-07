@@ -1,0 +1,11 @@
+---
+import { roleClass } from "../../data/helpers";
+
+interface Props {
+  role: string;
+}
+
+const { role } = Astro.props;
+---
+
+<span class={roleClass(role)}>{role}</span>

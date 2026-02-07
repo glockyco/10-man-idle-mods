@@ -1,11 +1,14 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import InfoBox from "../../components/ui/InfoBox.astro";
+import ItemLink from "../../components/ui/ItemLink.astro";
 import {
   getAllRecipeIds,
   getRecipe,
   getRecipeIngredients,
   getRecipeOutput,
 } from "../../data/recipes";
+import { formatDuration, formatGold, rarityClass } from "../../data/helpers";
 
 export function getStaticPaths() {
   return getAllRecipeIds().map((id) => ({ params: { id } }));
@@ -21,77 +24,75 @@ if (!recipe) {
 const ingredients = getRecipeIngredients(id);
 const output = getRecipeOutput(recipe);
 
-const rarityColor: Record<string, string> = {
-  Common: "var(--common)",
-  Uncommon: "var(--uncommon)",
-  Rare: "var(--rare)",
-  Epic: "var(--epic)",
-  Legendary: "var(--legendary)",
-};
+const crumbs = [
+  { label: "Home", href: "/" },
+  { label: "Recipes", href: "/recipes/" },
+  { label: recipe.name },
+];
+
+const detailRows = [
+  { label: "Profession", value: recipe.skill },
+  { label: "Required Level", value: String(recipe.required_level) },
+  { label: "Duration", value: formatDuration(recipe.duration) },
+  { label: "Gold Cost", value: formatGold(recipe.gold_cost) },
+];
 ---
 
-<BaseLayout title={recipe.name}>
-  <p><a href="/recipes/">&larr; All Recipes</a></p>
-  <h1 style="margin-top: 0.5rem;">{recipe.name}</h1>
+<BaseLayout title={recipe.name} crumbs={crumbs}>
+  <h1 class="text-2xl font-bold">{recipe.name}</h1>
 
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
-    <div>
-      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Details</h2>
-      <table style="width: 100%;">
-        <tbody>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Profession</td><td>{recipe.skill}</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Required Level</td><td>{recipe.required_level}</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Duration</td><td>{recipe.duration}s</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Gold Cost</td><td>{recipe.gold_cost}g</td></tr>
-        </tbody>
-      </table>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+    <div class="space-y-6">
+      <InfoBox title="Details" rows={detailRows} />
 
       {ingredients.length > 0 && (
-        <h2 style="color: var(--text-highlight); margin-top: 1.5rem; margin-bottom: 0.5rem;">Ingredients</h2>
-        <ul style="list-style: none;">
-          {ingredients.map((ing) => (
-            <li style="padding: 0.25rem 0;">
-              {ing.item_name ? (
-                <a href={`/items/${ing.item_id}/`}>{ing.item_name}</a>
-              ) : (
-                <span>{ing.item_id}</span>
-              )}
-              <span style="color: var(--text-dim);"> x{ing.quantity}</span>
-            </li>
-          ))}
-        </ul>
+        <div class="bg-surface border border-border rounded-lg p-5">
+          <h2 class="text-lg text-highlight mb-3">Ingredients</h2>
+          <ul class="list-none space-y-1">
+            {ingredients.map((ing) => (
+              <li class="flex items-center gap-2">
+                <ItemLink id={ing.item_id} name={ing.item_name} />
+                <span class="text-muted">x{ing.quantity}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
 
     <div>
       {output.kind === "item" && (
-        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Output</h2>
-        <p>
-          <a href={output.url} style={`color: ${rarityColor[output.item.rarity] ?? "var(--text)"}`}>
-            {output.item.name}
-          </a>
-          {recipe.output_quantity > 1 && (
-            <span style="color: var(--text-dim);"> x{recipe.output_quantity}</span>
-          )}
-        </p>
+        <div class="bg-surface border border-border rounded-lg p-5">
+          <h2 class="text-lg text-highlight mb-3">Output</h2>
+          <p>
+            <a href={output.url} class={rarityClass(output.item.rarity)}>{output.item.name}</a>
+            {recipe.output_quantity > 1 && (
+              <span class="text-muted"> x{recipe.output_quantity}</span>
+            )}
+          </p>
+        </div>
       )}
       {output.kind === "tool" && (
-        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Output</h2>
-        <p>
-          <a href={output.url}>{output.tool.name}</a>
-          {recipe.output_quantity > 1 && (
-            <span style="color: var(--text-dim);"> x{recipe.output_quantity}</span>
-          )}
-        </p>
+        <div class="bg-surface border border-border rounded-lg p-5">
+          <h2 class="text-lg text-highlight mb-3">Output</h2>
+          <p>
+            <a href={output.url}>{output.tool.name}</a>
+            {recipe.output_quantity > 1 && (
+              <span class="text-muted"> x{recipe.output_quantity}</span>
+            )}
+          </p>
+        </div>
       )}
       {output.kind === "unknown" && output.id && (
-        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Output</h2>
-        <p>
-          <span>{output.id}</span>
-          {recipe.output_quantity > 1 && (
-            <span style="color: var(--text-dim);"> x{recipe.output_quantity}</span>
-          )}
-        </p>
+        <div class="bg-surface border border-border rounded-lg p-5">
+          <h2 class="text-lg text-highlight mb-3">Output</h2>
+          <p>
+            <span>{output.id}</span>
+            {recipe.output_quantity > 1 && (
+              <span class="text-muted"> x{recipe.output_quantity}</span>
+            )}
+          </p>
+        </div>
       )}
     </div>
   </div>

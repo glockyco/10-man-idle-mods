@@ -1,35 +1,41 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getAllRaids } from "../../data/raids";
+import { raidUrl, formatDuration, formatGold } from "../../data/helpers";
 
 const raids = getAllRaids();
+
+const crumbs = [
+  { label: "Home", href: "/" },
+  { label: "Raids" },
+];
 ---
 
-<BaseLayout title="Raids">
-  <h1>Raids</h1>
-  <p style="color: var(--text-dim); margin: 0.5rem 0;">{raids.length} raids</p>
-  <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+<BaseLayout title="Raids" crumbs={crumbs}>
+  <h1 class="text-2xl font-bold">Raids</h1>
+  <p class="text-muted mt-2">{raids.length} raids</p>
+  <table class="w-full border-collapse mt-4">
     <thead>
-      <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-        <th style="padding: 0.5rem;">Name</th>
-        <th style="padding: 0.5rem;">Difficulty</th>
-        <th style="padding: 0.5rem;">Guild Lvl</th>
-        <th style="padding: 0.5rem;">Rec. CP</th>
-        <th style="padding: 0.5rem;">Duration</th>
-        <th style="padding: 0.5rem;">Gold</th>
-        <th style="padding: 0.5rem;">XP</th>
+      <tr class="border-b-2 border-border text-left">
+        <th class="p-2 text-sm text-muted font-semibold">Name</th>
+        <th class="p-2 text-sm text-muted font-semibold">Difficulty</th>
+        <th class="p-2 text-sm text-muted font-semibold">Guild Lvl</th>
+        <th class="p-2 text-sm text-muted font-semibold">Rec. CP</th>
+        <th class="p-2 text-sm text-muted font-semibold">Duration</th>
+        <th class="p-2 text-sm text-muted font-semibold">Gold</th>
+        <th class="p-2 text-sm text-muted font-semibold">XP</th>
       </tr>
     </thead>
     <tbody>
       {raids.map((r) => (
-        <tr style="border-bottom: 1px solid var(--border);">
-          <td style="padding: 0.5rem;"><a href={`/raids/${r.id}/`}>{r.name}</a></td>
-          <td style="padding: 0.5rem; color: var(--text-dim);">{r.difficulty}</td>
-          <td style="padding: 0.5rem;">{r.required_guild_level}</td>
-          <td style="padding: 0.5rem;">{r.recommended_combat_power}</td>
-          <td style="padding: 0.5rem; color: var(--text-dim);">{Math.round(r.base_duration)}s</td>
-          <td style="padding: 0.5rem;">{r.gold_reward}g</td>
-          <td style="padding: 0.5rem;">{r.experience_reward}</td>
+        <tr class="border-b border-border">
+          <td class="p-2"><a href={raidUrl(r.id)}>{r.name}</a></td>
+          <td class="p-2 text-muted">{r.difficulty}</td>
+          <td class="p-2">{r.required_guild_level}</td>
+          <td class="p-2">{r.recommended_combat_power}</td>
+          <td class="p-2 text-muted">{formatDuration(r.base_duration)}</td>
+          <td class="p-2">{formatGold(r.gold_reward)}</td>
+          <td class="p-2">{r.experience_reward}</td>
         </tr>
       ))}
     </tbody>

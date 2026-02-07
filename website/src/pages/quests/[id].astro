@@ -1,6 +1,9 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import InfoBox from "../../components/ui/InfoBox.astro";
+import LootTable from "../../components/ui/LootTable.astro";
 import { getAllQuestIds, getQuest, getQuestRewards } from "../../data/quests";
+import { formatDuration, formatGold } from "../../data/helpers";
 
 export function getStaticPaths() {
   return getAllQuestIds().map((id) => ({ params: { id } }));
@@ -15,69 +18,36 @@ if (!quest) {
 
 const rewards = getQuestRewards(id);
 
-const rarityColor: Record<string, string> = {
-  Common: "var(--common)",
-  Uncommon: "var(--uncommon)",
-  Rare: "var(--rare)",
-  Epic: "var(--epic)",
-  Legendary: "var(--legendary)",
-};
+const crumbs = [
+  { label: "Home", href: "/" },
+  { label: "Quests", href: "/quests/" },
+  { label: quest.name },
+];
+
+const detailRows = [
+  { label: "Type", value: quest.type },
+  { label: "Min Level", value: String(quest.min_character_level) },
+  { label: "Rec. Combat Power", value: String(quest.recommended_combat_power) },
+  { label: "Duration", value: formatDuration(quest.base_duration) },
+];
+
+const rewardRows = [
+  { label: "Gold", value: formatGold(quest.gold_reward) },
+  { label: "Experience", value: String(quest.experience_reward) },
+];
 ---
 
-<BaseLayout title={quest.name}>
-  <p><a href="/quests/">&larr; All Quests</a></p>
-  <h1 style="margin-top: 0.5rem;">{quest.name}</h1>
-  {quest.description && <p style="color: var(--text-dim); margin-top: 0.5rem;">{quest.description}</p>}
+<BaseLayout title={quest.name} crumbs={crumbs}>
+  <h1 class="text-2xl font-bold">{quest.name}</h1>
+  {quest.description && <p class="text-muted mt-2">{quest.description}</p>}
 
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
-    <div>
-      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Details</h2>
-      <table style="width: 100%;">
-        <tbody>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Type</td><td>{quest.type}</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Min Level</td><td>{quest.min_character_level}</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Rec. Combat Power</td><td>{quest.recommended_combat_power}</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Duration</td><td>{Math.round(quest.base_duration)}s</td></tr>
-        </tbody>
-      </table>
-
-      <h2 style="color: var(--text-highlight); margin-top: 1.5rem; margin-bottom: 0.5rem;">Rewards</h2>
-      <table style="width: 100%;">
-        <tbody>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Gold</td><td>{quest.gold_reward}g</td></tr>
-          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Experience</td><td>{quest.experience_reward}</td></tr>
-        </tbody>
-      </table>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+    <div class="space-y-6">
+      <InfoBox title="Details" rows={detailRows} />
+      <InfoBox title="Rewards" rows={rewardRows} />
     </div>
-
     <div>
-      {rewards.length > 0 && (
-        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Item Rewards</h2>
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-              <th style="padding: 0.5rem;">Item</th>
-              <th style="padding: 0.5rem;">Qty</th>
-              <th style="padding: 0.5rem;">Chance</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rewards.map((r) => (
-              <tr style="border-bottom: 1px solid var(--border);">
-                <td style="padding: 0.5rem;">
-                  <a href={`/items/${r.item_id}/`} style={`color: ${rarityColor[r.item_rarity ?? ""] ?? "var(--text)"}`}>
-                    {r.item_name ?? r.item_id}
-                  </a>
-                </td>
-                <td style="padding: 0.5rem; color: var(--text-dim);">
-                  {r.min_quantity === r.max_quantity ? r.min_quantity : `${r.min_quantity}-${r.max_quantity}`}
-                </td>
-                <td style="padding: 0.5rem;">{(r.chance * 100).toFixed(0)}%</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      <LootTable title="Item Rewards" drops={rewards} />
     </div>
   </div>
 </BaseLayout>

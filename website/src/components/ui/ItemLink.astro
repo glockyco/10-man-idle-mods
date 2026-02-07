@@ -1,0 +1,20 @@
+---
+import { rarityClass } from "../../data/helpers";
+
+interface Props {
+  id: string;
+  name: string | null;
+  rarity?: string | null;
+  href?: string;
+}
+
+const { id, name, rarity, href } = Astro.props;
+const resolvedHref = href ?? `/items/${id}/`;
+const colorClass = rarityClass(rarity);
+---
+
+{name ? (
+  <a href={resolvedHref} class={colorClass}>{name}</a>
+) : (
+  <span class="text-muted">{id}</span>
+)}

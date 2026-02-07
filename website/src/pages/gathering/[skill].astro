@@ -1,11 +1,19 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ItemLink from "../../components/ui/ItemLink.astro";
 import {
   getDistinctSkills,
   getNodesBySkill,
   getToolsBySkill,
   getDropsBySkill,
 } from "../../data/gathering";
+import {
+  itemUrl,
+  formatDuration,
+  formatSpeedBonus,
+  formatQuantityRange,
+  formatChance,
+} from "../../data/helpers";
 
 export function getStaticPaths() {
   return getDistinctSkills().map((skill) => ({ params: { skill } }));
@@ -29,34 +37,31 @@ for (const d of drops) {
 
 const tools = getToolsBySkill(skill);
 
-const rarityColor: Record<string, string> = {
-  Common: "var(--common)",
-  Uncommon: "var(--uncommon)",
-  Rare: "var(--rare)",
-  Epic: "var(--epic)",
-  Legendary: "var(--legendary)",
-};
+const crumbs = [
+  { label: "Home", href: "/" },
+  { label: "Gathering", href: "/gathering/" },
+  { label: skill },
+];
 ---
 
-<BaseLayout title={`${skill} - Gathering`}>
-  <p><a href="/gathering/">&larr; All Gathering Skills</a></p>
-  <h1 style="margin-top: 0.5rem;">{skill}</h1>
+<BaseLayout title={`${skill} - Gathering`} crumbs={crumbs}>
+  <h1 class="text-2xl font-bold">{skill}</h1>
 
   {tools.length > 0 && (
-    <div style="margin-top: 1.5rem;">
-      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Tools</h2>
-      <table style="width: 100%; border-collapse: collapse;">
+    <div class="mt-6">
+      <h2 class="text-lg text-highlight mb-3">Tools</h2>
+      <table class="w-full border-collapse">
         <thead>
-          <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-            <th style="padding: 0.5rem;">Name</th>
-            <th style="padding: 0.5rem;">Speed Bonus</th>
+          <tr class="border-b-2 border-border text-left">
+            <th class="p-2 text-sm text-muted font-semibold">Name</th>
+            <th class="p-2 text-sm text-muted font-semibold">Speed Bonus</th>
           </tr>
         </thead>
         <tbody>
           {tools.map((t) => (
-            <tr style="border-bottom: 1px solid var(--border);">
-              <td style="padding: 0.5rem;"><a href={`/items/${t.id}/`}>{t.name}</a></td>
-              <td style="padding: 0.5rem;">+{(t.speed_bonus * 100).toFixed(0)}%</td>
+            <tr class="border-b border-border">
+              <td class="p-2"><a href={itemUrl(t.id)}>{t.name}</a></td>
+              <td class="p-2">{formatSpeedBonus(t.speed_bonus)}</td>
             </tr>
           ))}
         </tbody>
@@ -64,37 +69,33 @@ const rarityColor: Record<string, string> = {
     </div>
   )}
 
-  <div style="margin-top: 2rem;">
-    <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Nodes ({nodes.length})</h2>
+  <div class="mt-8">
+    <h2 class="text-lg text-highlight mb-3">Nodes ({nodes.length})</h2>
     {nodes.map((node) => {
       const nodeDrops = dropsByNode.get(node.id) ?? [];
       return (
-        <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;">
-          <h3 style="color: var(--text-highlight);">{node.name}</h3>
-          <p style="color: var(--text-dim); margin: 0.25rem 0;">
-            Level {node.required_level} &middot; {node.base_duration}s base duration
+        <div class="mt-4 p-4 bg-surface border border-border rounded-lg">
+          <h3 class="text-highlight font-semibold">{node.name}</h3>
+          <p class="text-muted text-sm mt-1">
+            Level {node.required_level} &middot; {formatDuration(node.base_duration)} base duration
           </p>
           {nodeDrops.length > 0 && (
-            <table style="width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+            <table class="w-full border-collapse mt-3">
               <thead>
-                <tr style="border-bottom: 1px solid var(--border); text-align: left;">
-                  <th style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Drop</th>
-                  <th style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Qty</th>
-                  <th style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Chance</th>
+                <tr class="border-b border-border text-left">
+                  <th class="py-1 px-2 text-sm text-muted font-semibold">Drop</th>
+                  <th class="py-1 px-2 text-sm text-muted font-semibold">Qty</th>
+                  <th class="py-1 px-2 text-sm text-muted font-semibold">Chance</th>
                 </tr>
               </thead>
               <tbody>
                 {nodeDrops.map((d) => (
                   <tr>
-                    <td style="padding: 0.25rem 0.5rem;">
-                      <a href={`/items/${d.item_id}/`} style={`color: ${rarityColor[d.item_rarity ?? ""] ?? "var(--text)"}`}>
-                        {d.item_name ?? d.item_id}
-                      </a>
+                    <td class="py-1 px-2">
+                      <ItemLink id={d.item_id} name={d.item_name} rarity={d.item_rarity} />
                     </td>
-                    <td style="padding: 0.25rem 0.5rem; color: var(--text-dim);">
-                      {d.min_quantity === d.max_quantity ? d.min_quantity : `${d.min_quantity}-${d.max_quantity}`}
-                    </td>
-                    <td style="padding: 0.25rem 0.5rem;">{(d.chance * 100).toFixed(0)}%</td>
+                    <td class="py-1 px-2 text-muted">{formatQuantityRange(d.min_quantity, d.max_quantity)}</td>
+                    <td class="py-1 px-2">{formatChance(d.chance)}</td>
                   </tr>
                 ))}
               </tbody>
