@@ -1,4 +1,4 @@
-import { query } from "../lib/db";
+import { query, queryOne } from "../lib/db";
 import type { GatheringNode, GatheringTool, GatheringDrop } from "./types";
 
 export function getAllNodes(): GatheringNode[] {
@@ -37,6 +37,19 @@ export function getDropsBySkill(skill: string): GatheringDrop[] {
      WHERE gn.skill = ?
      ORDER BY gd.node_id, gd.chance DESC`,
     [skill],
+  );
+}
+
+export function getTool(id: string): GatheringTool | undefined {
+  return queryOne<GatheringTool>(
+    "SELECT * FROM gathering_tools WHERE id = ?",
+    [id],
+  );
+}
+
+export function getAllToolIds(): string[] {
+  return query<{ id: string }>("SELECT id FROM gathering_tools").map(
+    (r) => r.id,
   );
 }
 

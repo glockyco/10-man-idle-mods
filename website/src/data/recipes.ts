@@ -1,5 +1,5 @@
 import { query, queryOne } from "../lib/db";
-import { itemUrl } from "./helpers";
+import { itemUrl, toolUrl } from "./helpers";
 import type {
   Recipe,
   RecipeWithOutput,
@@ -48,8 +48,7 @@ export function getRecipeOutput(recipe: Recipe): RecipeOutput {
     [recipe.output_item_id],
   );
   if (tool) {
-    // Tools live at /items/[id]/ for now; switch to toolUrl() in Phase 4
-    return { kind: "tool", tool, url: itemUrl(tool.id) };
+    return { kind: "tool", tool, url: toolUrl(tool.id) };
   }
 
   return { kind: "unknown", id: recipe.output_item_id };

@@ -1,0 +1,56 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import InfoBox from "../../../components/ui/InfoBox.astro";
+import { getAllToolIds, getTool } from "../../../data/gathering";
+import { getRecipesProducingItem } from "../../../data/items";
+import { formatSpeedBonus, gatheringUrl } from "../../../data/helpers";
+
+export function getStaticPaths() {
+  return getAllToolIds().map((id) => ({ params: { id } }));
+}
+
+const { id } = Astro.params;
+const tool = getTool(id);
+
+if (!tool) {
+  return Astro.redirect("/gathering/");
+}
+
+const recipes = getRecipesProducingItem(id);
+
+const rows = [
+  { label: "Category", value: "Gathering Tool" },
+  { label: "Skill", value: tool.skill },
+  { label: "Speed Bonus", value: formatSpeedBonus(tool.speed_bonus) },
+];
+
+const crumbs = [
+  { label: "Home", href: "/" },
+  { label: "Gathering", href: "/gathering/" },
+  { label: tool.skill, href: gatheringUrl(tool.skill) },
+  { label: tool.name },
+];
+---
+
+<BaseLayout title={tool.name} crumbs={crumbs}>
+  <h1 class="text-2xl font-bold">{tool.name}</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+    <InfoBox title="Properties" rows={rows}>
+      <div class="mt-2">
+        <a href={gatheringUrl(tool.skill)} class="text-sm">{tool.skill} &rarr;</a>
+      </div>
+    </InfoBox>
+
+    {recipes.length > 0 && (
+      <div class="bg-surface border border-border rounded-lg p-5">
+        <h2 class="text-lg text-highlight mb-3">Crafted By</h2>
+        <ul class="space-y-1">
+          {recipes.map((r) => (
+            <li><a href={`/recipes/${r.id}/`}>{r.name}</a></li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+</BaseLayout>

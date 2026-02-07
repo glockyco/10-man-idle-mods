@@ -8,7 +8,7 @@ import {
   getDropsBySkill,
 } from "../../data/gathering";
 import {
-  itemUrl,
+  toolUrl,
   formatDuration,
   formatSpeedBonus,
   formatQuantityRange,
@@ -60,7 +60,7 @@ const crumbs = [
         <tbody>
           {tools.map((t) => (
             <tr class="border-b border-border">
-              <td class="p-2"><a href={itemUrl(t.id)}>{t.name}</a></td>
+              <td class="p-2"><a href={toolUrl(t.id)}>{t.name}</a></td>
               <td class="p-2">{formatSpeedBonus(t.speed_bonus)}</td>
             </tr>
           ))}

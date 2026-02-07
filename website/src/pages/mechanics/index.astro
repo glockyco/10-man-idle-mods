@@ -1,8 +1,86 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getAllConstants } from "../../data/constants";
+
+const constants = getAllConstants();
+
+const formulaKeys = constants.filter((c) => c.key.includes("formula"));
+const multiplierKeys = constants.filter((c) => c.key.includes("multiplier"));
+const otherKeys = constants.filter(
+  (c) => !c.key.includes("formula") && !c.key.includes("multiplier"),
+);
+
+function formatKey(key: string): string {
+  return key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+const crumbs = [
+  { label: "Home", href: "/" },
+  { label: "Mechanics" },
+];
 ---
 
-<BaseLayout title="Mechanics">
-  <h1>Mechanics</h1>
-  <p style="color: var(--text-dim); margin-top: 0.5rem;">Coming soon.</p>
+<BaseLayout title="Mechanics" crumbs={crumbs}>
+  <h1 class="text-2xl font-bold">Game Mechanics</h1>
+  <p class="text-muted mt-2">
+    {constants.length} game constants and formulas extracted from the game data.
+  </p>
+
+  {formulaKeys.length > 0 && (
+    <div class="mt-8">
+      <h2 class="text-lg text-highlight mb-3">Formulas ({formulaKeys.length})</h2>
+      <div class="space-y-3">
+        {formulaKeys.map((c) => (
+          <div class="p-4 bg-surface border border-border rounded-lg">
+            <h3 class="text-sm text-muted">{formatKey(c.key)}</h3>
+            <p class="mt-1 font-mono text-accent">{c.value}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {multiplierKeys.length > 0 && (
+    <div class="mt-8">
+      <h2 class="text-lg text-highlight mb-3">Rarity Multipliers ({multiplierKeys.length})</h2>
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="border-b-2 border-border text-left">
+            <th class="p-2 text-sm text-muted font-semibold">Constant</th>
+            <th class="p-2 text-sm text-muted font-semibold">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {multiplierKeys.map((c) => (
+            <tr class="border-b border-border">
+              <td class="p-2">{formatKey(c.key)}</td>
+              <td class="p-2 font-mono">{c.value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  {otherKeys.length > 0 && (
+    <div class="mt-8">
+      <h2 class="text-lg text-highlight mb-3">General ({otherKeys.length})</h2>
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="border-b-2 border-border text-left">
+            <th class="p-2 text-sm text-muted font-semibold">Constant</th>
+            <th class="p-2 text-sm text-muted font-semibold">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {otherKeys.map((c) => (
+            <tr class="border-b border-border">
+              <td class="p-2">{formatKey(c.key)}</td>
+              <td class="p-2 font-mono">{c.value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
 </BaseLayout>

@@ -6,12 +6,7 @@ import {
   questUrl,
   recipeUrl,
 } from "./helpers";
-import type {
-  Item,
-  RecipeUsage,
-  ItemSource,
-  GatheringTool,
-} from "./types";
+import type { Item, RecipeUsage, ItemSource } from "./types";
 
 export function getAllItems(): Item[] {
   return query<Item>(
@@ -153,17 +148,4 @@ export function getItemSources(itemId: string): ItemSource[] {
 
 export function getAllItemIds(): string[] {
   return query<{ id: string }>("SELECT id FROM items").map((r) => r.id);
-}
-
-export function getAllToolIds(): string[] {
-  return query<{ id: string }>("SELECT id FROM gathering_tools").map(
-    (r) => r.id,
-  );
-}
-
-export function getTool(id: string): GatheringTool | undefined {
-  return queryOne<GatheringTool>(
-    "SELECT * FROM gathering_tools WHERE id = ?",
-    [id],
-  );
 }

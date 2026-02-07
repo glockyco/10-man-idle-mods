@@ -5,40 +5,31 @@ import SourcesList from "../../components/ui/SourcesList.astro";
 import RarityBadge from "../../components/ui/RarityBadge.astro";
 import {
   getAllItemIds,
-  getAllToolIds,
   getItem,
-  getTool,
   getItemClasses,
   getRecipesProducingItem,
   getRecipesUsingItem,
   getItemSources,
 } from "../../data/items";
-import {
-  rarityClass,
-  formatSpeedBonus,
-  formatGold,
-} from "../../data/helpers";
+import { rarityClass, formatGold } from "../../data/helpers";
 
 export function getStaticPaths() {
-  const items = getAllItemIds();
-  const tools = getAllToolIds();
-  return [...items, ...tools].map((id) => ({ params: { id } }));
+  return getAllItemIds().map((id) => ({ params: { id } }));
 }
 
 const { id } = Astro.params;
 const item = getItem(id);
-const tool = !item ? getTool(id) : null;
 
-if (!item && !tool) {
+if (!item) {
   return Astro.redirect("/items/");
 }
 
 const recipeOutput = getRecipesProducingItem(id);
-const classes = item ? getItemClasses(id) : [];
-const recipesUsedIn = item ? getRecipesUsingItem(id) : [];
-const allSources = item ? getItemSources(id) : [];
+const classes = getItemClasses(id);
+const recipesUsedIn = getRecipesUsingItem(id);
+const allSources = getItemSources(id);
 
-const itemRows = item ? [
+const rows = [
   { label: "Category", value: item.category },
   { label: "Rarity", value: item.rarity, class: rarityClass(item.rarity) },
   { label: "Item Level", value: String(item.item_level) },
@@ -49,75 +40,55 @@ const itemRows = item ? [
   { label: "Base Value", value: formatGold(item.base_value) },
   { label: "Max Stack", value: String(item.max_stack_size) },
   ...(item.consumable_type ? [{ label: "Consumable", value: item.consumable_type }] : []),
-] : [];
+];
 
-const toolRows = tool ? [
-  { label: "Category", value: "Gathering Tool" },
-  { label: "Skill", value: tool.skill },
-  { label: "Speed Bonus", value: formatSpeedBonus(tool.speed_bonus) },
-] : [];
-
-const crumbs = tool
-  ? [{ label: "Home", href: "/" }, { label: "Gathering", href: "/gathering/" }, { label: tool.skill, href: `/gathering/${tool.skill}/` }, { label: tool.name }]
-  : [{ label: "Home", href: "/" }, { label: "Items", href: "/items/" }, { label: item!.name }];
+const crumbs = [
+  { label: "Home", href: "/" },
+  { label: "Items", href: "/items/" },
+  { label: item.name },
+];
 ---
 
-<BaseLayout title={tool?.name ?? item!.name} crumbs={crumbs}>
-  {tool ? (
-    <h1 class="text-2xl font-bold mt-2">{tool.name}</h1>
+<BaseLayout title={item.name} crumbs={crumbs}>
+  <h1 class={`text-2xl font-bold mt-2 ${rarityClass(item.rarity)}`}>{item.name}</h1>
+  <RarityBadge rarity={item.rarity} />
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
-      <InfoBox title="Properties" rows={toolRows}>
-        <div class="mt-2">
-          <a href={`/gathering/${tool.skill}/`} class="text-sm">{tool.skill} &rarr;</a>
-        </div>
-      </InfoBox>
-
-      <div>
-        {recipeOutput.length > 0 && (
-          <div class="bg-surface border border-border rounded-lg p-5">
-            <h2 class="text-lg text-highlight mb-3">Crafted By</h2>
-            <ul class="space-y-1">
-              {recipeOutput.map((r) => (
-                <li><a href={`/recipes/${r.id}/`}>{r.name}</a></li>
-              ))}
-            </ul>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+    <div>
+      <InfoBox title="Properties" rows={rows}>
+        {classes.length > 0 && (
+          <div class="mt-3 pt-3 border-t border-border">
+            <h3 class="text-sm text-highlight mb-1">Allowed Classes</h3>
+            <p>{classes.join(", ")}</p>
           </div>
         )}
-      </div>
+      </InfoBox>
     </div>
-  ) : (
-    <>
-      <h1 class={`text-2xl font-bold mt-2 ${rarityClass(item!.rarity)}`}>{item!.name}</h1>
-      <RarityBadge rarity={item!.rarity} />
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
-        <div>
-          <InfoBox title="Properties" rows={itemRows}>
-            {classes.length > 0 && (
-              <div class="mt-3 pt-3 border-t border-border">
-                <h3 class="text-sm text-highlight mb-1">Allowed Classes</h3>
-                <p>{classes.join(", ")}</p>
-              </div>
-            )}
-          </InfoBox>
+    <div class="space-y-4">
+      <SourcesList sources={allSources} />
+
+      {recipeOutput.length > 0 && (
+        <div class="bg-surface border border-border rounded-lg p-5">
+          <h2 class="text-lg text-highlight mb-3">Crafted By</h2>
+          <ul class="space-y-1">
+            {recipeOutput.map((r) => (
+              <li><a href={`/recipes/${r.id}/`}>{r.name}</a></li>
+            ))}
+          </ul>
         </div>
+      )}
 
-        <div class="space-y-4">
-          <SourcesList sources={allSources} />
-
-          {recipesUsedIn.length > 0 && (
-            <div class="bg-surface border border-border rounded-lg p-5">
-              <h2 class="text-lg text-highlight mb-3">Used In</h2>
-              <ul class="space-y-1">
-                {recipesUsedIn.map((r) => (
-                  <li><a href={`/recipes/${r.recipe_id}/`}>{r.recipe_name}</a></li>
-                ))}
-              </ul>
-            </div>
-          )}
+      {recipesUsedIn.length > 0 && (
+        <div class="bg-surface border border-border rounded-lg p-5">
+          <h2 class="text-lg text-highlight mb-3">Used In</h2>
+          <ul class="space-y-1">
+            {recipesUsedIn.map((r) => (
+              <li><a href={`/recipes/${r.recipe_id}/`}>{r.recipe_name}</a></li>
+            ))}
+          </ul>
         </div>
-      </div>
-    </>
-  )}
+      )}
+    </div>
+  </div>
 </BaseLayout>

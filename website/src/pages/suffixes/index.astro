@@ -1,8 +1,52 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getAllSuffixes } from "../../data/suffixes";
+
+const suffixes = getAllSuffixes();
+
+const categories = [...new Set(suffixes.map((s) => s.category))];
+const byCategory = new Map<string, typeof suffixes>();
+for (const s of suffixes) {
+  const list = byCategory.get(s.category) ?? [];
+  list.push(s);
+  byCategory.set(s.category, list);
+}
+
+const crumbs = [
+  { label: "Home", href: "/" },
+  { label: "Suffixes" },
+];
 ---
 
-<BaseLayout title="Suffixes">
-  <h1>Suffixes</h1>
-  <p style="color: var(--text-dim); margin-top: 0.5rem;">Coming soon.</p>
+<BaseLayout title="Suffixes" crumbs={crumbs}>
+  <h1 class="text-2xl font-bold">Suffixes</h1>
+  <p class="text-muted mt-2">
+    {suffixes.length} item suffixes across {categories.length} categories.
+    Suffixes modify an item's combat power by a multiplier.
+  </p>
+
+  {categories.map((cat) => {
+    const items = byCategory.get(cat) ?? [];
+    return (
+      <div class="mt-8">
+        <h2 class="text-lg text-highlight mb-3">{cat} ({items.length})</h2>
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b-2 border-border text-left">
+              <th class="p-2 text-sm text-muted font-semibold">Suffix</th>
+              <th class="p-2 text-sm text-muted font-semibold">CP Multiplier</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((s) => (
+              <tr class="border-b border-border">
+                <td class="p-2">{s.name}</td>
+                <td class="p-2">{s.combat_power_multiplier > 0 ? `+${(s.combat_power_multiplier * 100).toFixed(0)}%` : `${(s.combat_power_multiplier * 100).toFixed(0)}%`}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  })}
 </BaseLayout>
