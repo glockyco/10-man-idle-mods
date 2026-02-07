@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <!-- Set this to your 10-Man Idle game installation path -->
+    <GameDir>C:\path\to\10-Man Idle</GameDir>
+  </PropertyGroup>
+</Project>

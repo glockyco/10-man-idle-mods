@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AnalysisMode>Recommended</AnalysisMode>
+  </PropertyGroup>
+
+  <!-- GameDir: path to the 10-Man Idle game installation.
+       Set via Directory.Build.props.user, env var, or CLI override. -->
+  <PropertyGroup Condition="'$(GameDir)' == ''">
+    <GameDir>$(TENMAN_GAME_DIR)</GameDir>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,17 @@
+pre-commit:
+  parallel: true
+  commands:
+    biome:
+      glob: "website/**/*.{ts,tsx,js,json,astro,svelte}"
+      run: pnpm --prefix website biome check {staged_files}
+    csharpier:
+      glob: "**/*.cs"
+      run: dotnet csharpier --check {staged_files}
+    svelte-check:
+      glob: "website/**/*.{svelte,ts}"
+      run: pnpm --prefix website svelte-check
+
+commit-msg:
+  commands:
+    commitlint:
+      run: pnpm commitlint --edit {1}
