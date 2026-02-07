@@ -1,0 +1,150 @@
+---
+/**
+ * Hover preview for entity links. Attach to BaseLayout.
+ *
+ * Any link with a data-preview="type:id" attribute will show a
+ * floating preview card on hover/focus with key stats loaded
+ * from /preview-data.json (fetched once, cached).
+ */
+---
+
+<div id="preview-card" class="preview-card" hidden>
+  <p id="preview-name" class="preview-name"></p>
+  <p id="preview-type" class="preview-type"></p>
+  <dl id="preview-props" class="preview-props"></dl>
+</div>
+
+<script is:inline>
+  (function () {
+    var card = document.getElementById("preview-card");
+    var nameEl = document.getElementById("preview-name");
+    var typeEl = document.getElementById("preview-type");
+    var propsEl = document.getElementById("preview-props");
+    var data = null;
+    var showTimer = null;
+    var currentTarget = null;
+
+    function loadData() {
+      if (data) return Promise.resolve(data);
+      return fetch("/preview-data.json")
+        .then(function (r) { return r.json(); })
+        .then(function (d) { data = d; return d; })
+        .catch(function () { return null; });
+    }
+
+    function show(target) {
+      var key = target.getAttribute("data-preview");
+      if (!key || !data || !data[key]) return;
+      var entry = data[key];
+
+      nameEl.textContent = entry.name;
+      typeEl.textContent = entry.type;
+      propsEl.innerHTML = "";
+      for (var i = 0; i < entry.props.length; i++) {
+        var dt = document.createElement("dt");
+        dt.textContent = entry.props[i][0];
+        var dd = document.createElement("dd");
+        dd.textContent = entry.props[i][1];
+        propsEl.appendChild(dt);
+        propsEl.appendChild(dd);
+      }
+
+      // Position above or below the link
+      var rect = target.getBoundingClientRect();
+      var cardWidth = 220;
+      var left = rect.left + rect.width / 2 - cardWidth / 2;
+      left = Math.max(8, Math.min(left, window.innerWidth - cardWidth - 8));
+
+      card.style.left = left + "px";
+      card.style.width = cardWidth + "px";
+      card.hidden = false;
+
+      // Measure card and decide above/below
+      var cardHeight = card.offsetHeight;
+      if (rect.top > cardHeight + 12) {
+        card.style.top = (rect.top + window.scrollY - cardHeight - 6) + "px";
+      } else {
+        card.style.top = (rect.bottom + window.scrollY + 6) + "px";
+      }
+    }
+
+    function hide() {
+      clearTimeout(showTimer);
+      card.hidden = true;
+      currentTarget = null;
+    }
+
+    // Eagerly load preview data
+    loadData();
+
+    document.addEventListener("pointerenter", function (e) {
+      var target = e.target.closest("[data-preview]");
+      if (!target) return;
+      currentTarget = target;
+      clearTimeout(showTimer);
+      showTimer = setTimeout(function () {
+        if (currentTarget === target) show(target);
+      }, 200);
+    }, true);
+
+    document.addEventListener("pointerleave", function (e) {
+      var target = e.target.closest("[data-preview]");
+      if (target) hide();
+    }, true);
+
+    document.addEventListener("focusin", function (e) {
+      var target = e.target.closest("[data-preview]");
+      if (target) {
+        currentTarget = target;
+        show(target);
+      }
+    });
+
+    document.addEventListener("focusout", function (e) {
+      var target = e.target.closest("[data-preview]");
+      if (target) hide();
+    });
+  })();
+</script>
+
+<style is:global>
+  .preview-card {
+    position: absolute;
+    z-index: 200;
+    background: var(--color-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    padding: 10px 14px;
+    pointer-events: none;
+  }
+
+  .preview-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-foreground);
+  }
+
+  .preview-type {
+    font-size: 12px;
+    color: var(--color-muted);
+    margin-top: 2px;
+  }
+
+  .preview-props {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2px 10px;
+    margin-top: 8px;
+    font-size: 12px;
+  }
+
+  .preview-props dt {
+    color: var(--color-muted);
+  }
+
+  .preview-props dd {
+    color: var(--color-foreground);
+    text-align: right;
+  }
+</style>

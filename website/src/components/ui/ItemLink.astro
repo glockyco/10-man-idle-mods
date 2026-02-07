@@ -6,15 +6,16 @@ interface Props {
   name: string | null;
   rarity?: string | null;
   href?: string;
+  previewType?: string;
 }
 
-const { id, name, rarity, href } = Astro.props;
+const { id, name, rarity, href, previewType = "item" } = Astro.props;
 const resolvedHref = href ?? `/items/${id}/`;
 const colorClass = rarityClass(rarity);
 ---
 
 {name ? (
-  <a href={resolvedHref} class={colorClass}>{name}</a>
+  <a href={resolvedHref} class={colorClass} data-preview={`${previewType}:${id}`}>{name}</a>
 ) : (
   <span class="text-muted">{id}</span>
 )}
