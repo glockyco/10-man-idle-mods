@@ -1,0 +1,112 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { query, queryOne } from "../../lib/db";
+
+interface Dungeon {
+  id: string;
+  name: string;
+  description: string | null;
+  required_guild_level: number;
+  difficulty: string;
+  recommended_combat_power: number;
+  base_duration: number;
+  gold_reward: number;
+  experience_reward: number;
+}
+
+interface LootDrop {
+  item_id: string;
+  item_name: string;
+  item_rarity: string;
+  min_quantity: number;
+  max_quantity: number;
+  chance: number;
+}
+
+export function getStaticPaths() {
+  const dungeons = query<{ id: string }>("SELECT id FROM dungeons");
+  return dungeons.map((d) => ({ params: { id: d.id } }));
+}
+
+const { id } = Astro.params;
+const dungeon = queryOne<Dungeon>("SELECT * FROM dungeons WHERE id = ?", [id]);
+
+if (!dungeon) {
+  return Astro.redirect("/dungeons/");
+}
+
+const loot = query<LootDrop>(
+  `SELECT dl.item_id, i.name as item_name, i.rarity as item_rarity,
+          dl.min_quantity, dl.max_quantity, dl.chance
+   FROM dungeon_loot dl LEFT JOIN items i ON dl.item_id = i.id
+   WHERE dl.dungeon_id = ?
+   ORDER BY dl.chance DESC`,
+  [id]
+);
+
+const rarityColor: Record<string, string> = {
+  Common: "var(--common)",
+  Uncommon: "var(--uncommon)",
+  Rare: "var(--rare)",
+  Epic: "var(--epic)",
+  Legendary: "var(--legendary)",
+};
+---
+
+<BaseLayout title={dungeon.name}>
+  <p><a href="/dungeons/">&larr; All Dungeons</a></p>
+  <h1 style="margin-top: 0.5rem;">{dungeon.name}</h1>
+  {dungeon.description && <p style="color: var(--text-dim); margin-top: 0.5rem;">{dungeon.description}</p>}
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+    <div>
+      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Requirements</h2>
+      <table style="width: 100%;">
+        <tbody>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Difficulty</td><td>{dungeon.difficulty}</td></tr>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Guild Level</td><td>{dungeon.required_guild_level}</td></tr>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Rec. Combat Power</td><td>{dungeon.recommended_combat_power}</td></tr>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Duration</td><td>{Math.round(dungeon.base_duration)}s</td></tr>
+        </tbody>
+      </table>
+
+      <h2 style="color: var(--text-highlight); margin-top: 1.5rem; margin-bottom: 0.5rem;">Rewards</h2>
+      <table style="width: 100%;">
+        <tbody>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Gold</td><td>{dungeon.gold_reward}g</td></tr>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Experience</td><td>{dungeon.experience_reward}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      {loot.length > 0 && (
+        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Loot Table</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+              <th style="padding: 0.5rem;">Item</th>
+              <th style="padding: 0.5rem;">Qty</th>
+              <th style="padding: 0.5rem;">Chance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loot.map((l) => (
+              <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 0.5rem;">
+                  <a href={`/items/${l.item_id}/`} style={`color: ${rarityColor[l.item_rarity] ?? "var(--text)"}`}>
+                    {l.item_name}
+                  </a>
+                </td>
+                <td style="padding: 0.5rem; color: var(--text-dim);">
+                  {l.min_quantity === l.max_quantity ? l.min_quantity : `${l.min_quantity}-${l.max_quantity}`}
+                </td>
+                <td style="padding: 0.5rem;">{(l.chance * 100).toFixed(0)}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  </div>
+</BaseLayout>

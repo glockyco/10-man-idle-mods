@@ -1,0 +1,162 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { query, queryOne, hasDb } from "../../lib/db";
+
+interface Item {
+  id: string;
+  name: string;
+  category: string;
+  rarity: string;
+  base_value: number;
+  max_stack_size: number;
+  item_level: number;
+  slot: string | null;
+  armor_type: string | null;
+  combat_power: number;
+  material_type: string | null;
+  tier: number;
+  consumable_type: string | null;
+  duration: number;
+  effect_value: number;
+}
+
+interface AllowedClass {
+  class: string;
+}
+
+interface RecipeUsage {
+  recipe_id: string;
+  recipe_name: string;
+}
+
+interface DropSource {
+  source_type: string;
+  source_id: string;
+  source_name: string;
+  chance: number;
+}
+
+export function getStaticPaths() {
+  const items = query<{ id: string }>("SELECT id FROM items");
+  return items.map((item) => ({ params: { id: item.id } }));
+}
+
+const { id } = Astro.params;
+const item = queryOne<Item>("SELECT * FROM items WHERE id = ?", [id]);
+
+if (!item) {
+  return Astro.redirect("/items/");
+}
+
+const classes = query<AllowedClass>(
+  "SELECT class FROM item_allowed_classes WHERE item_id = ?",
+  [id]
+);
+
+const recipesUsedIn = query<RecipeUsage>(
+  `SELECT r.id as recipe_id, r.name as recipe_name
+   FROM recipe_ingredients ri JOIN recipes r ON ri.recipe_id = r.id
+   WHERE ri.item_id = ?`,
+  [id]
+);
+
+const recipeOutput = query<{ id: string; name: string }>(
+  "SELECT id, name FROM recipes WHERE output_item_id = ?",
+  [id]
+);
+
+const dungeonDrops = query<DropSource>(
+  `SELECT 'dungeon' as source_type, d.id as source_id, d.name as source_name, dl.chance
+   FROM dungeon_loot dl JOIN dungeons d ON dl.dungeon_id = d.id
+   WHERE dl.item_id = ?`,
+  [id]
+);
+
+const raidDrops = query<DropSource>(
+  `SELECT 'raid' as source_type, r.id as source_id, r.name as source_name, rl.chance
+   FROM raid_loot rl JOIN raids r ON rl.raid_id = r.id
+   WHERE rl.item_id = ?`,
+  [id]
+);
+
+const gatheringDrops = query<DropSource>(
+  `SELECT 'gathering' as source_type, g.id as source_id, g.name as source_name, gd.chance
+   FROM gathering_drops gd JOIN gathering_nodes g ON gd.node_id = g.id
+   WHERE gd.item_id = ?`,
+  [id]
+);
+
+const allSources = [...dungeonDrops, ...raidDrops, ...gatheringDrops];
+
+const rarityColor: Record<string, string> = {
+  Common: "var(--common)",
+  Uncommon: "var(--uncommon)",
+  Rare: "var(--rare)",
+  Epic: "var(--epic)",
+  Legendary: "var(--legendary)",
+};
+---
+
+<BaseLayout title={item.name}>
+  <p><a href="/items/">&larr; All Items</a></p>
+  <h1 style={`color: ${rarityColor[item.rarity] ?? "var(--text)"}; margin-top: 0.5rem;`}>{item.name}</h1>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+    <div>
+      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Properties</h2>
+      <table style="width: 100%;">
+        <tbody>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Category</td><td>{item.category}</td></tr>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Rarity</td><td style={`color: ${rarityColor[item.rarity]}`}>{item.rarity}</td></tr>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Item Level</td><td>{item.item_level}</td></tr>
+          {item.slot && <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Slot</td><td>{item.slot}</td></tr>}
+          {item.armor_type && <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Armor Type</td><td>{item.armor_type}</td></tr>}
+          {item.combat_power > 0 && <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Combat Power</td><td>{item.combat_power}</td></tr>}
+          {item.material_type && <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Material</td><td>{item.material_type}</td></tr>}
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Base Value</td><td>{item.base_value}g</td></tr>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Max Stack</td><td>{item.max_stack_size}</td></tr>
+          {item.consumable_type && <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Consumable</td><td>{item.consumable_type}</td></tr>}
+        </tbody>
+      </table>
+
+      {classes.length > 0 && (
+        <h3 style="color: var(--text-highlight); margin-top: 1rem;">Allowed Classes</h3>
+        <p>{classes.map((c) => c.class).join(", ")}</p>
+      )}
+    </div>
+
+    <div>
+      {allSources.length > 0 && (
+        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Found In</h2>
+        <ul style="list-style: none;">
+          {allSources.map((s) => (
+            <li style="padding: 0.25rem 0;">
+              <a href={`/${s.source_type === "gathering" ? "gathering" : s.source_type + "s"}/${s.source_id}/`}>
+                {s.source_name}
+              </a>
+              <span style="color: var(--text-dim);"> ({(s.chance * 100).toFixed(0)}%)</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {recipeOutput.length > 0 && (
+        <h2 style="color: var(--text-highlight); margin-top: 1rem; margin-bottom: 0.5rem;">Crafted By</h2>
+        <ul style="list-style: none;">
+          {recipeOutput.map((r) => (
+            <li><a href={`/recipes/${r.id}/`}>{r.name}</a></li>
+          ))}
+        </ul>
+      )}
+
+      {recipesUsedIn.length > 0 && (
+        <h2 style="color: var(--text-highlight); margin-top: 1rem; margin-bottom: 0.5rem;">Used In</h2>
+        <ul style="list-style: none;">
+          {recipesUsedIn.map((r) => (
+            <li><a href={`/recipes/${r.recipe_id}/`}>{r.recipe_name}</a></li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </div>
+</BaseLayout>

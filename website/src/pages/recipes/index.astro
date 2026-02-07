@@ -1,0 +1,72 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { query, hasDb } from "../../lib/db";
+
+interface Recipe {
+  id: string;
+  name: string;
+  skill: string;
+  required_level: number;
+  output_item_id: string;
+  output_item_name: string;
+  output_quantity: number;
+  gold_cost: number;
+}
+
+const recipes = query<Recipe>(
+  `SELECT r.id, r.name, r.skill, r.required_level,
+          r.output_item_id, i.name as output_item_name, r.output_quantity, r.gold_cost
+   FROM recipes r LEFT JOIN items i ON r.output_item_id = i.id
+   ORDER BY r.skill, r.required_level, r.name`
+);
+
+const skills = [...new Set(recipes.map((r) => r.skill))].sort();
+const recipesBySkill = skills.map((s) => ({
+  skill: s,
+  recipes: recipes.filter((r) => r.skill === s),
+}));
+---
+
+<BaseLayout title="Recipes">
+  <h1>Recipes</h1>
+  {!hasDb && <p style="color: var(--text-dim);">Database not found. Run the DataExporter mod first.</p>}
+  {hasDb && (<>
+    <p style="color: var(--text-dim); margin: 0.5rem 0;">{recipes.length} recipes across {skills.length} professions</p>
+
+    {recipesBySkill.map((group) => (
+      <div style="margin-top: 2rem;">
+        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">{group.skill} ({group.recipes.length})</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+              <th style="padding: 0.5rem;">Recipe</th>
+              <th style="padding: 0.5rem;">Level</th>
+              <th style="padding: 0.5rem;">Output</th>
+              <th style="padding: 0.5rem;">Qty</th>
+              <th style="padding: 0.5rem;">Gold Cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            {group.recipes.map((r) => (
+              <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 0.5rem;">
+                  <a href={`/recipes/${r.id}/`}>{r.name}</a>
+                </td>
+                <td style="padding: 0.5rem;">{r.required_level}</td>
+                <td style="padding: 0.5rem;">
+                  {r.output_item_id ? (
+                    <a href={`/items/${r.output_item_id}/`}>{r.output_item_name}</a>
+                  ) : (
+                    <span style="color: var(--text-dim);">—</span>
+                  )}
+                </td>
+                <td style="padding: 0.5rem;">{r.output_quantity}</td>
+                <td style="padding: 0.5rem;">{r.gold_cost}g</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ))}
+  </>)}
+</BaseLayout>

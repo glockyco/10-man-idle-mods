@@ -1,0 +1,144 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { query } from "../../lib/db";
+
+interface GatheringNode {
+  id: string;
+  name: string;
+  skill: string;
+  required_level: number;
+  base_duration: number;
+}
+
+interface NodeDrop {
+  node_id: string;
+  item_id: string;
+  item_name: string;
+  item_rarity: string;
+  min_quantity: number;
+  max_quantity: number;
+  chance: number;
+}
+
+interface GatheringTool {
+  id: string;
+  name: string;
+  skill: string;
+  speed_bonus: number;
+}
+
+export function getStaticPaths() {
+  const skills = query<{ skill: string }>("SELECT DISTINCT skill FROM gathering_nodes");
+  return skills.map((s) => ({ params: { skill: s.skill } }));
+}
+
+const { skill } = Astro.params;
+
+const nodes = query<GatheringNode>(
+  "SELECT * FROM gathering_nodes WHERE skill = ? ORDER BY required_level, name",
+  [skill]
+);
+
+if (nodes.length === 0) {
+  return Astro.redirect("/gathering/");
+}
+
+const drops = query<NodeDrop>(
+  `SELECT gd.node_id, gd.item_id, i.name as item_name, i.rarity as item_rarity,
+          gd.min_quantity, gd.max_quantity, gd.chance
+   FROM gathering_drops gd
+   LEFT JOIN items i ON gd.item_id = i.id
+   JOIN gathering_nodes gn ON gd.node_id = gn.id
+   WHERE gn.skill = ?
+   ORDER BY gd.node_id, gd.chance DESC`,
+  [skill]
+);
+
+const dropsByNode = new Map<string, NodeDrop[]>();
+for (const d of drops) {
+  const list = dropsByNode.get(d.node_id) ?? [];
+  list.push(d);
+  dropsByNode.set(d.node_id, list);
+}
+
+const tools = query<GatheringTool>(
+  "SELECT * FROM gathering_tools WHERE skill = ? ORDER BY speed_bonus",
+  [skill]
+);
+
+const rarityColor: Record<string, string> = {
+  Common: "var(--common)",
+  Uncommon: "var(--uncommon)",
+  Rare: "var(--rare)",
+  Epic: "var(--epic)",
+  Legendary: "var(--legendary)",
+};
+---
+
+<BaseLayout title={`${skill} - Gathering`}>
+  <p><a href="/gathering/">&larr; All Gathering Skills</a></p>
+  <h1 style="margin-top: 0.5rem;">{skill}</h1>
+
+  {tools.length > 0 && (
+    <div style="margin-top: 1.5rem;">
+      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Tools</h2>
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+            <th style="padding: 0.5rem;">Name</th>
+            <th style="padding: 0.5rem;">Speed Bonus</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tools.map((t) => (
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 0.5rem;"><a href={`/items/${t.id}/`}>{t.name}</a></td>
+              <td style="padding: 0.5rem;">+{(t.speed_bonus * 100).toFixed(0)}%</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  <div style="margin-top: 2rem;">
+    <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Nodes ({nodes.length})</h2>
+    {nodes.map((node) => {
+      const nodeDrops = dropsByNode.get(node.id) ?? [];
+      return (
+        <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;">
+          <h3 style="color: var(--text-highlight);">{node.name}</h3>
+          <p style="color: var(--text-dim); margin: 0.25rem 0;">
+            Level {node.required_level} &middot; {node.base_duration}s base duration
+          </p>
+          {nodeDrops.length > 0 && (
+            <table style="width: 100%; border-collapse: collapse; margin-top: 0.5rem;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                  <th style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Drop</th>
+                  <th style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Qty</th>
+                  <th style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Chance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {nodeDrops.map((d) => (
+                  <tr>
+                    <td style="padding: 0.25rem 0.5rem;">
+                      <a href={`/items/${d.item_id}/`} style={`color: ${rarityColor[d.item_rarity] ?? "var(--text)"}`}>
+                        {d.item_name}
+                      </a>
+                    </td>
+                    <td style="padding: 0.25rem 0.5rem; color: var(--text-dim);">
+                      {d.min_quantity === d.max_quantity ? d.min_quantity : `${d.min_quantity}-${d.max_quantity}`}
+                    </td>
+                    <td style="padding: 0.25rem 0.5rem;">{(d.chance * 100).toFixed(0)}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      );
+    })}
+  </div>
+</BaseLayout>

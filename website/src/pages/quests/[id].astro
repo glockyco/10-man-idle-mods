@@ -1,0 +1,112 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { query, queryOne } from "../../lib/db";
+
+interface Quest {
+  id: string;
+  name: string;
+  description: string | null;
+  type: string;
+  min_character_level: number;
+  recommended_combat_power: number;
+  base_duration: number;
+  gold_reward: number;
+  experience_reward: number;
+}
+
+interface QuestReward {
+  item_id: string;
+  item_name: string;
+  item_rarity: string;
+  min_quantity: number;
+  max_quantity: number;
+  chance: number;
+}
+
+export function getStaticPaths() {
+  const quests = query<{ id: string }>("SELECT id FROM quests");
+  return quests.map((q) => ({ params: { id: q.id } }));
+}
+
+const { id } = Astro.params;
+const quest = queryOne<Quest>("SELECT * FROM quests WHERE id = ?", [id]);
+
+if (!quest) {
+  return Astro.redirect("/quests/");
+}
+
+const rewards = query<QuestReward>(
+  `SELECT qr.item_id, i.name as item_name, i.rarity as item_rarity,
+          qr.min_quantity, qr.max_quantity, qr.chance
+   FROM quest_rewards qr LEFT JOIN items i ON qr.item_id = i.id
+   WHERE qr.quest_id = ?
+   ORDER BY qr.chance DESC`,
+  [id]
+);
+
+const rarityColor: Record<string, string> = {
+  Common: "var(--common)",
+  Uncommon: "var(--uncommon)",
+  Rare: "var(--rare)",
+  Epic: "var(--epic)",
+  Legendary: "var(--legendary)",
+};
+---
+
+<BaseLayout title={quest.name}>
+  <p><a href="/quests/">&larr; All Quests</a></p>
+  <h1 style="margin-top: 0.5rem;">{quest.name}</h1>
+  {quest.description && <p style="color: var(--text-dim); margin-top: 0.5rem;">{quest.description}</p>}
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+    <div>
+      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Details</h2>
+      <table style="width: 100%;">
+        <tbody>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Type</td><td>{quest.type}</td></tr>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Min Level</td><td>{quest.min_character_level}</td></tr>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Rec. Combat Power</td><td>{quest.recommended_combat_power}</td></tr>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Duration</td><td>{Math.round(quest.base_duration)}s</td></tr>
+        </tbody>
+      </table>
+
+      <h2 style="color: var(--text-highlight); margin-top: 1.5rem; margin-bottom: 0.5rem;">Rewards</h2>
+      <table style="width: 100%;">
+        <tbody>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Gold</td><td>{quest.gold_reward}g</td></tr>
+          <tr><td style="color: var(--text-dim); padding: 0.25rem 0;">Experience</td><td>{quest.experience_reward}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      {rewards.length > 0 && (
+        <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Item Rewards</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+              <th style="padding: 0.5rem;">Item</th>
+              <th style="padding: 0.5rem;">Qty</th>
+              <th style="padding: 0.5rem;">Chance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rewards.map((r) => (
+              <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 0.5rem;">
+                  <a href={`/items/${r.item_id}/`} style={`color: ${rarityColor[r.item_rarity] ?? "var(--text)"}`}>
+                    {r.item_name}
+                  </a>
+                </td>
+                <td style="padding: 0.5rem; color: var(--text-dim);">
+                  {r.min_quantity === r.max_quantity ? r.min_quantity : `${r.min_quantity}-${r.max_quantity}`}
+                </td>
+                <td style="padding: 0.5rem;">{(r.chance * 100).toFixed(0)}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  </div>
+</BaseLayout>

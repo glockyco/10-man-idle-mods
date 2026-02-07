@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { query, hasDb } from "../../lib/db";
+
+interface CharacterClass {
+  name: string;
+  armor_type: string;
+  roles: string;
+}
+
+const classes = query<CharacterClass>(
+  "SELECT * FROM character_classes ORDER BY name"
+);
+
+const roleColor: Record<string, string> = {
+  Tank: "var(--rare)",
+  Healer: "var(--uncommon)",
+  DPS: "var(--accent)",
+};
+---
+
+<BaseLayout title="Classes">
+  <h1>Classes</h1>
+  {!hasDb && <p style="color: var(--text-dim);">Database not found. Run the DataExporter mod first.</p>}
+  {hasDb && (
+    <p style="color: var(--text-dim); margin: 0.5rem 0;">{classes.length} classes</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+      {classes.map((c) => (
+        <a href={`/classes/${c.name}/`} style="display: block; padding: 1.5rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;">
+          <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">{c.name}</h2>
+          <p style="color: var(--text-dim); margin-bottom: 0.25rem;">Armor: {c.armor_type}</p>
+          <p>
+            {c.roles.split(",").map((role, i) => (
+              <>
+                {i > 0 && <span style="color: var(--text-dim);"> / </span>}
+                <span style={`color: ${roleColor[role] ?? "var(--text)"}`}>{role}</span>
+              </>
+            ))}
+          </p>
+        </a>
+      ))}
+    </div>
+  )}
+</BaseLayout>
