@@ -1,0 +1,42 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Home">
+  <h1>10-Man Idle Wiki</h1>
+  <p style="margin: 1rem 0; color: var(--text-dim);">
+    Community game data wiki for 10-Man Idle. All data is extracted
+    directly from the game files.
+  </p>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-top: 2rem;">
+    <a href="/items/" style="display: block; padding: 1.5rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;">
+      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Items</h2>
+      <p style="color: var(--text-dim);">Equipment, materials, and consumables</p>
+    </a>
+    <a href="/recipes/" style="display: block; padding: 1.5rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;">
+      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Recipes</h2>
+      <p style="color: var(--text-dim);">Crafting recipes by profession</p>
+    </a>
+    <a href="/dungeons/" style="display: block; padding: 1.5rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;">
+      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Dungeons</h2>
+      <p style="color: var(--text-dim);">Dungeon info, loot tables, requirements</p>
+    </a>
+    <a href="/raids/" style="display: block; padding: 1.5rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;">
+      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Raids</h2>
+      <p style="color: var(--text-dim);">Raid encounters and exclusive loot</p>
+    </a>
+    <a href="/quests/" style="display: block; padding: 1.5rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;">
+      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Quests</h2>
+      <p style="color: var(--text-dim);">Quest list by type and level</p>
+    </a>
+    <a href="/classes/" style="display: block; padding: 1.5rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;">
+      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Classes</h2>
+      <p style="color: var(--text-dim);">Character classes, roles, and armor types</p>
+    </a>
+    <a href="/gathering/" style="display: block; padding: 1.5rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;">
+      <h2 style="color: var(--text-highlight); margin-bottom: 0.5rem;">Gathering</h2>
+      <p style="color: var(--text-dim);">Gathering skills, nodes, and tools</p>
+    </a>
+  </div>
+</BaseLayout>
