@@ -17,6 +17,9 @@ pnpm-debug.log*
 .env
 .env.production
 
+# link checker cache
+.link-checker/
+
 # macOS-specific files
 .DS_Store
 

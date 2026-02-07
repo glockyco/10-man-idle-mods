@@ -55,7 +55,7 @@ const recipesBySkill = skills.map((s) => ({
                 <td style="padding: 0.5rem;">{r.required_level}</td>
                 <td style="padding: 0.5rem;">
                   {r.output_item_id ? (
-                    <a href={`/items/${r.output_item_id}/`}>{r.output_item_name}</a>
+                    <a href={`/items/${r.output_item_id}/`}>{r.output_item_name ?? r.output_item_id}</a>
                   ) : (
                     <span style="color: var(--text-dim);">—</span>
                   )}

@@ -78,7 +78,11 @@ const rarityColor: Record<string, string> = {
         <ul style="list-style: none;">
           {ingredients.map((ing) => (
             <li style="padding: 0.25rem 0;">
-              <a href={`/items/${ing.item_id}/`}>{ing.item_name}</a>
+              {ing.item_name ? (
+                <a href={`/items/${ing.item_id}/`}>{ing.item_name}</a>
+              ) : (
+                <span>{ing.item_id}</span>
+              )}
               <span style="color: var(--text-dim);"> x{ing.quantity}</span>
             </li>
           ))}
