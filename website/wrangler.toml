@@ -1,0 +1,5 @@
+name = "10-man-codex"
+compatibility_date = "2026-02-07"
+
+[assets]
+directory = "./dist"

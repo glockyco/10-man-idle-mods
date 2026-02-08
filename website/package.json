@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build && npx pagefind --site dist",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "cf-deploy": "pnpm build && wrangler deploy"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
@@ -27,6 +28,7 @@
     "@commitlint/cli": "^20.4.1",
     "@commitlint/config-conventional": "^20.4.1",
     "@types/better-sqlite3": "^7.6.13",
-    "pagefind": "^1.4.0"
+    "pagefind": "^1.4.0",
+    "wrangler": "^4.63.0"
   }
 }
