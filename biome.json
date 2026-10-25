@@ -1,7 +1,7 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
   "files": {
-    "include": ["website/**/*.{ts,tsx,js,json,astro,svelte}"]
+    "includes": ["website/**/*.{ts,tsx,js,json,astro}"]
   },
   "formatter": {
     "indentStyle": "space",
