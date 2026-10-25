@@ -1,8 +1,8 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import CategoryCard from "../../components/ui/CategoryCard.astro";
 import { getAllNodes, getAllTools } from "../../data/gathering";
 import { gatheringUrl } from "../../data/helpers";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const nodes = getAllNodes();
 const tools = getAllTools();
@@ -18,10 +18,7 @@ const skillCards = skills.map((skill) => {
   };
 });
 
-const crumbs = [
-  { label: "Home", href: "/" },
-  { label: "Gathering" },
-];
+const crumbs = [{ label: "Home", href: "/" }, { label: "Gathering" }];
 ---
 
 <BaseLayout title="Gathering" crumbs={crumbs}>

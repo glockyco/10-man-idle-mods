@@ -1,14 +1,11 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import ItemLink from "../../components/ui/ItemLink.astro";
 import { getAllItems } from "../../data/items";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const items = getAllItems();
 
-const crumbs = [
-  { label: "Home", href: "/" },
-  { label: "Items" },
-];
+const crumbs = [{ label: "Home", href: "/" }, { label: "Items" }];
 
 const categories = [...new Set(items.map((i) => i.category))].sort();
 const rarities = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];

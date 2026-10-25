@@ -1,10 +1,10 @@
-import { getAllItems } from "./items";
-import { getAllTools } from "./gathering";
 import { getAllDungeons } from "./dungeons";
-import { getAllRaids } from "./raids";
+import { getAllTools } from "./gathering";
+import { formatDuration, formatGold, formatSpeedBonus } from "./helpers";
+import { getAllItems } from "./items";
 import { getAllQuests } from "./quests";
+import { getAllRaids } from "./raids";
 import { getAllRecipes } from "./recipes";
-import { formatSpeedBonus, formatDuration, formatGold } from "./helpers";
 
 export interface PreviewEntry {
   name: string;
@@ -23,9 +23,7 @@ export function buildPreviewData(): Record<string, PreviewEntry> {
         ["Rarity", item.rarity],
         ["Level", String(item.item_level)],
         ...(item.slot ? [["Slot", item.slot] as [string, string]] : []),
-        ...(item.combat_power > 0
-          ? [["CP", String(item.combat_power)] as [string, string]]
-          : []),
+        ...(item.combat_power > 0 ? [["CP", String(item.combat_power)] as [string, string]] : []),
       ],
     };
   }

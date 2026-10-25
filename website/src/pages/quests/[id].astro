@@ -1,9 +1,9 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import InfoBox from "../../components/ui/InfoBox.astro";
 import LootTable from "../../components/ui/LootTable.astro";
-import { getAllQuestIds, getQuest, getQuestRewards } from "../../data/quests";
 import { formatDuration, formatGold } from "../../data/helpers";
+import { getAllQuestIds, getQuest, getQuestRewards } from "../../data/quests";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export function getStaticPaths() {
   return getAllQuestIds().map((id) => ({ params: { id } }));

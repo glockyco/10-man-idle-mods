@@ -1,9 +1,9 @@
 ---
 import "../styles/global.css";
-import Nav from "../components/layout/Nav.astro";
+import HoverPreview from "../components/interactive/hover-preview.astro";
 import Breadcrumbs from "../components/layout/Breadcrumbs.astro";
 import Footer from "../components/layout/Footer.astro";
-import HoverPreview from "../components/interactive/hover-preview.astro";
+import Nav from "../components/layout/Nav.astro";
 
 interface Props {
   title: string;
@@ -11,11 +11,7 @@ interface Props {
   crumbs?: { label: string; href?: string }[];
 }
 
-const {
-  title,
-  description = "Game data codex for 10-Man Idle",
-  crumbs,
-} = Astro.props;
+const { title, description = "Game data codex for 10-Man Idle", crumbs } = Astro.props;
 ---
 
 <!doctype html>

@@ -1,15 +1,12 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import RoleBadge from "../../components/ui/RoleBadge.astro";
 import { getAllClasses } from "../../data/classes";
 import { classUrl } from "../../data/helpers";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const classes = getAllClasses();
 
-const crumbs = [
-  { label: "Home", href: "/" },
-  { label: "Classes" },
-];
+const crumbs = [{ label: "Home", href: "/" }, { label: "Classes" }];
 ---
 
 <BaseLayout title="Classes" crumbs={crumbs}>

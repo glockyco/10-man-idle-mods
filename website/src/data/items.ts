@@ -1,17 +1,9 @@
 import { query, queryOne } from "../lib/db";
-import {
-  dungeonUrl,
-  raidUrl,
-  gatheringUrl,
-  questUrl,
-  recipeUrl,
-} from "./helpers";
-import type { Item, RecipeUsage, ItemSource } from "./types";
+import { dungeonUrl, gatheringUrl, questUrl, raidUrl, recipeUrl } from "./helpers";
+import type { Item, ItemSource, RecipeUsage } from "./types";
 
 export function getAllItems(): Item[] {
-  return query<Item>(
-    "SELECT * FROM items ORDER BY item_level DESC, name",
-  );
+  return query<Item>("SELECT * FROM items ORDER BY item_level DESC, name");
 }
 
 export function getItem(id: string): Item | undefined {
@@ -19,15 +11,12 @@ export function getItem(id: string): Item | undefined {
 }
 
 export function getItemClasses(itemId: string): string[] {
-  return query<{ class: string }>(
-    "SELECT class FROM item_allowed_classes WHERE item_id = ?",
-    [itemId],
-  ).map((r) => r.class);
+  return query<{ class: string }>("SELECT class FROM item_allowed_classes WHERE item_id = ?", [
+    itemId,
+  ]).map((r) => r.class);
 }
 
-export function getRecipesProducingItem(
-  itemId: string,
-): { id: string; name: string }[] {
+export function getRecipesProducingItem(itemId: string): { id: string; name: string }[] {
   return query<{ id: string; name: string }>(
     "SELECT id, name FROM recipes WHERE output_item_id = ?",
     [itemId],

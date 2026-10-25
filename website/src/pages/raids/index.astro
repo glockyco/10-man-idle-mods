@@ -1,14 +1,11 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import { formatDuration, formatGold, raidUrl } from "../../data/helpers";
 import { getAllRaids } from "../../data/raids";
-import { raidUrl, formatDuration, formatGold } from "../../data/helpers";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const raids = getAllRaids();
 
-const crumbs = [
-  { label: "Home", href: "/" },
-  { label: "Raids" },
-];
+const crumbs = [{ label: "Home", href: "/" }, { label: "Raids" }];
 ---
 
 <BaseLayout title="Raids" crumbs={crumbs}>

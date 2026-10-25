@@ -1,6 +1,6 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getAllSuffixes } from "../../data/suffixes";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const suffixes = getAllSuffixes();
 
@@ -12,10 +12,7 @@ for (const s of suffixes) {
   byCategory.set(s.category, list);
 }
 
-const crumbs = [
-  { label: "Home", href: "/" },
-  { label: "Suffixes" },
-];
+const crumbs = [{ label: "Home", href: "/" }, { label: "Suffixes" }];
 ---
 
 <BaseLayout title="Suffixes" crumbs={crumbs}>

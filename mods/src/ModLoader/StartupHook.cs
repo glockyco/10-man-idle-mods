@@ -59,28 +59,42 @@ internal sealed class StartupHook
 
                     foreach (var type in types)
                     {
-                        if (typeof(IGameMod).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+                        if (
+                            typeof(IGameMod).IsAssignableFrom(type)
+                            && !type.IsInterface
+                            && !type.IsAbstract
+                        )
                         {
                             if (Activator.CreateInstance(type) is IGameMod mod)
                             {
                                 mods.Add(mod);
-                                ModLogger.Log("ModLoader", $"Discovered: {mod.Name} v{mod.Version}");
+                                ModLogger.Log(
+                                    "ModLoader",
+                                    $"Discovered: {mod.Name} v{mod.Version}"
+                                );
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    ModLogger.Log("ModLoader", $"Failed to load {Path.GetFileName(dll)}: {ex.Message}");
+                    ModLogger.Log(
+                        "ModLoader",
+                        $"Failed to load {Path.GetFileName(dll)}: {ex.Message}"
+                    );
                 }
             }
 
             // Sort by priority (lower = earlier), then by name
-            mods.Sort((a, b) =>
-            {
-                var cmp = a.Priority.CompareTo(b.Priority);
-                return cmp != 0 ? cmp : string.Compare(a.Name, b.Name, StringComparison.Ordinal);
-            });
+            mods.Sort(
+                (a, b) =>
+                {
+                    var cmp = a.Priority.CompareTo(b.Priority);
+                    return cmp != 0
+                        ? cmp
+                        : string.Compare(a.Name, b.Name, StringComparison.Ordinal);
+                }
+            );
 
             // Initialize mods
             foreach (var mod in mods)
@@ -103,7 +117,11 @@ internal sealed class StartupHook
             // Last resort — never crash the game
             try
             {
-                var fallbackLog = Path.Combine(AppContext.BaseDirectory, "Mods", "modloader-error.log");
+                var fallbackLog = Path.Combine(
+                    AppContext.BaseDirectory,
+                    "Mods",
+                    "modloader-error.log"
+                );
                 File.WriteAllText(fallbackLog, $"{DateTime.Now:O}\n{ex}");
             }
             catch

@@ -2,9 +2,7 @@ import { query, queryOne } from "../lib/db";
 import type { Dungeon, LootDrop } from "./types";
 
 export function getAllDungeons(): Dungeon[] {
-  return query<Dungeon>(
-    "SELECT * FROM dungeons ORDER BY required_guild_level, name",
-  );
+  return query<Dungeon>("SELECT * FROM dungeons ORDER BY required_guild_level, name");
 }
 
 export function getDungeon(id: string): Dungeon | undefined {

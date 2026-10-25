@@ -2,16 +2,11 @@ import { query, queryOne } from "../lib/db";
 import type { CharacterClass, ClassItem } from "./types";
 
 export function getAllClasses(): CharacterClass[] {
-  return query<CharacterClass>(
-    "SELECT * FROM character_classes ORDER BY name",
-  );
+  return query<CharacterClass>("SELECT * FROM character_classes ORDER BY name");
 }
 
 export function getClass(name: string): CharacterClass | undefined {
-  return queryOne<CharacterClass>(
-    "SELECT * FROM character_classes WHERE name = ?",
-    [name],
-  );
+  return queryOne<CharacterClass>("SELECT * FROM character_classes WHERE name = ?", [name]);
 }
 
 export function getClassEquipment(className: string): ClassItem[] {
@@ -26,7 +21,5 @@ export function getClassEquipment(className: string): ClassItem[] {
 }
 
 export function getAllClassNames(): string[] {
-  return query<{ name: string }>(
-    "SELECT name FROM character_classes",
-  ).map((r) => r.name);
+  return query<{ name: string }>("SELECT name FROM character_classes").map((r) => r.name);
 }

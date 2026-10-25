@@ -1,13 +1,13 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
 import CategoryCard from "../components/ui/CategoryCard.astro";
-import { getAllItems } from "../data/items";
-import { getAllRecipes } from "../data/recipes";
-import { getAllDungeons } from "../data/dungeons";
-import { getAllRaids } from "../data/raids";
-import { getAllQuests } from "../data/quests";
-import { getAllNodes, getAllTools } from "../data/gathering";
 import { getAllClasses } from "../data/classes";
+import { getAllDungeons } from "../data/dungeons";
+import { getAllNodes, getAllTools } from "../data/gathering";
+import { getAllItems } from "../data/items";
+import { getAllQuests } from "../data/quests";
+import { getAllRaids } from "../data/raids";
+import { getAllRecipes } from "../data/recipes";
+import BaseLayout from "../layouts/BaseLayout.astro";
 
 const items = getAllItems();
 const recipes = getAllRecipes();

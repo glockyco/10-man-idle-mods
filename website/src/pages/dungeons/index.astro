@@ -1,14 +1,11 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getAllDungeons } from "../../data/dungeons";
 import { dungeonUrl, formatDuration, formatGold } from "../../data/helpers";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const dungeons = getAllDungeons();
 
-const crumbs = [
-  { label: "Home", href: "/" },
-  { label: "Dungeons" },
-];
+const crumbs = [{ label: "Home", href: "/" }, { label: "Dungeons" }];
 ---
 
 <BaseLayout title="Dungeons" crumbs={crumbs}>

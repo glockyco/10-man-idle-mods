@@ -1,14 +1,14 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import InfoBox from "../../components/ui/InfoBox.astro";
 import ItemLink from "../../components/ui/ItemLink.astro";
+import { formatDuration, formatGold, rarityClass } from "../../data/helpers";
 import {
   getAllRecipeIds,
   getRecipe,
   getRecipeIngredients,
   getRecipeOutput,
 } from "../../data/recipes";
-import { formatDuration, formatGold, rarityClass } from "../../data/helpers";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export function getStaticPaths() {
   return getAllRecipeIds().map((id) => ({ params: { id } }));

@@ -1,8 +1,8 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import ItemLink from "../../components/ui/ItemLink.astro";
+import { formatGold, recipeUrl } from "../../data/helpers";
 import { getAllRecipes } from "../../data/recipes";
-import { recipeUrl, formatGold } from "../../data/helpers";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const recipes = getAllRecipes();
 const skills = [...new Set(recipes.map((r) => r.skill))].sort();
@@ -11,10 +11,7 @@ const recipesBySkill = skills.map((s) => ({
   recipes: recipes.filter((r) => r.skill === s),
 }));
 
-const crumbs = [
-  { label: "Home", href: "/" },
-  { label: "Recipes" },
-];
+const crumbs = [{ label: "Home", href: "/" }, { label: "Recipes" }];
 ---
 
 <BaseLayout title="Recipes" crumbs={crumbs}>

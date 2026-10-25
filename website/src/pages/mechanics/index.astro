@@ -1,6 +1,6 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getAllConstants } from "../../data/constants";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const constants = getAllConstants();
 
@@ -14,10 +14,7 @@ function formatKey(key: string): string {
   return key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-const crumbs = [
-  { label: "Home", href: "/" },
-  { label: "Mechanics" },
-];
+const crumbs = [{ label: "Home", href: "/" }, { label: "Mechanics" }];
 ---
 
 <BaseLayout title="Mechanics" crumbs={crumbs}>

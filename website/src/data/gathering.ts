@@ -1,10 +1,8 @@
 import { query, queryOne } from "../lib/db";
-import type { GatheringNode, GatheringTool, GatheringDrop } from "./types";
+import type { GatheringDrop, GatheringNode, GatheringTool } from "./types";
 
 export function getAllNodes(): GatheringNode[] {
-  return query<GatheringNode>(
-    "SELECT * FROM gathering_nodes ORDER BY skill, required_level, name",
-  );
+  return query<GatheringNode>("SELECT * FROM gathering_nodes ORDER BY skill, required_level, name");
 }
 
 export function getNodesBySkill(skill: string): GatheringNode[] {
@@ -15,9 +13,7 @@ export function getNodesBySkill(skill: string): GatheringNode[] {
 }
 
 export function getAllTools(): GatheringTool[] {
-  return query<GatheringTool>(
-    "SELECT * FROM gathering_tools ORDER BY skill, speed_bonus",
-  );
+  return query<GatheringTool>("SELECT * FROM gathering_tools ORDER BY skill, speed_bonus");
 }
 
 export function getToolsBySkill(skill: string): GatheringTool[] {
@@ -41,20 +37,15 @@ export function getDropsBySkill(skill: string): GatheringDrop[] {
 }
 
 export function getTool(id: string): GatheringTool | undefined {
-  return queryOne<GatheringTool>(
-    "SELECT * FROM gathering_tools WHERE id = ?",
-    [id],
-  );
+  return queryOne<GatheringTool>("SELECT * FROM gathering_tools WHERE id = ?", [id]);
 }
 
 export function getAllToolIds(): string[] {
-  return query<{ id: string }>("SELECT id FROM gathering_tools").map(
-    (r) => r.id,
-  );
+  return query<{ id: string }>("SELECT id FROM gathering_tools").map((r) => r.id);
 }
 
 export function getDistinctSkills(): string[] {
-  return query<{ skill: string }>(
-    "SELECT DISTINCT skill FROM gathering_nodes ORDER BY skill",
-  ).map((r) => r.skill);
+  return query<{ skill: string }>("SELECT DISTINCT skill FROM gathering_nodes ORDER BY skill").map(
+    (r) => r.skill,
+  );
 }
