@@ -2,6 +2,7 @@
   "name": "10-man-idle-mods",
   "type": "module",
   "private": true,
+  "packageManager": "pnpm@10.30.3",
   "devDependencies": {
     "@biomejs/biome": "^2.3.14",
     "@commitlint/cli": "^20.4.1",

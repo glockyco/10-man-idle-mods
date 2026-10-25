@@ -107,6 +107,7 @@ Use the root lockfile for reproducible installs.
 
 Hooks run automatically on commit:
 - Biome checks website formatting, lint and imports.
+- Astro checks website types.
 - CSharpier checks C# formatting.
 - commitlint checks the commit message.
 

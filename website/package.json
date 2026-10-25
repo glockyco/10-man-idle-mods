@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "check": "astro check",
     "build": "astro build && npx pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro",
@@ -17,8 +18,10 @@
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.12",
     "@types/better-sqlite3": "^7.6.13",
     "pagefind": "^1.4.0",
+    "typescript": "~5.9.3",
     "wrangler": "^4.63.0"
   }
 }
