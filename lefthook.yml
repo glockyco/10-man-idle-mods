@@ -3,7 +3,7 @@ pre-commit:
   commands:
     biome:
       glob: "website/**/*.{ts,tsx,js,json,astro}"
-      run: pnpm exec biome check {staged_files}
+      run: pnpm exec biome check --error-on-warnings {staged_files}
     typecheck:
       glob: "website/**/*.{ts,tsx,js,mjs,json,astro}"
       run: pnpm --dir website check
