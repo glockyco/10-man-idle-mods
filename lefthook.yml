@@ -4,6 +4,9 @@ pre-commit:
     biome:
       glob: "website/**/*.{ts,tsx,js,json,astro}"
       run: pnpm exec biome check {staged_files}
+    typecheck:
+      glob: "website/**/*.{ts,tsx,js,mjs,json,astro}"
+      run: pnpm --dir website check
     csharpier:
       glob: "**/*.cs"
       run: dotnet csharpier check {staged_files}
