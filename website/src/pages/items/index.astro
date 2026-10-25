@@ -6,10 +6,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 const items = getAllItems();
 
 const crumbs = [{ label: "Home", href: "/" }, { label: "Items" }];
-
-const categories = [...new Set(items.map((i) => i.category))].sort();
-const rarities = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
-const slots = [...new Set(items.filter((i) => i.slot).map((i) => i.slot!))].sort();
 ---
 
 <BaseLayout title="Items" crumbs={crumbs}>

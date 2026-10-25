@@ -113,3 +113,6 @@ Hooks run automatically on commit:
 
 Run all source hooks with `lefthook run pre-commit --all-files`.
 The hook commands and file selection live in lefthook.yml.
+
+Astro's type check rejects unused imports, locals and parameters because
+it understands template references that Biome's frontmatter analysis misses.
