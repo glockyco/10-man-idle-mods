@@ -1,7 +1,7 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import { formatDuration, formatGold, questUrl } from "../../data/helpers";
 import { getAllQuests } from "../../data/quests";
-import { questUrl, formatDuration, formatGold } from "../../data/helpers";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const quests = getAllQuests();
 const types = [...new Set(quests.map((q) => q.type))].sort();
@@ -10,10 +10,7 @@ const questsByType = types.map((t) => ({
   quests: quests.filter((q) => q.type === t),
 }));
 
-const crumbs = [
-  { label: "Home", href: "/" },
-  { label: "Quests" },
-];
+const crumbs = [{ label: "Home", href: "/" }, { label: "Quests" }];
 ---
 
 <BaseLayout title="Quests" crumbs={crumbs}>

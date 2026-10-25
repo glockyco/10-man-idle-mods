@@ -1,17 +1,17 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import InfoBox from "../../components/ui/InfoBox.astro";
-import SourcesList from "../../components/ui/SourcesList.astro";
 import RarityBadge from "../../components/ui/RarityBadge.astro";
+import SourcesList from "../../components/ui/SourcesList.astro";
+import { formatGold, rarityClass } from "../../data/helpers";
 import {
   getAllItemIds,
   getItem,
   getItemClasses,
+  getItemSources,
   getRecipesProducingItem,
   getRecipesUsingItem,
-  getItemSources,
 } from "../../data/items";
-import { rarityClass, formatGold } from "../../data/helpers";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export function getStaticPaths() {
   return getAllItemIds().map((id) => ({ params: { id } }));

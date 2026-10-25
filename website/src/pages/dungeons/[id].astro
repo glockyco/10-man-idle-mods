@@ -1,9 +1,9 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import InfoBox from "../../components/ui/InfoBox.astro";
 import LootTable from "../../components/ui/LootTable.astro";
 import { getAllDungeonIds, getDungeon, getDungeonLoot } from "../../data/dungeons";
 import { formatDuration, formatGold } from "../../data/helpers";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export function getStaticPaths() {
   return getAllDungeonIds().map((id) => ({ params: { id } }));

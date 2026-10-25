@@ -1,9 +1,9 @@
 ---
-import BaseLayout from "../../../layouts/BaseLayout.astro";
 import InfoBox from "../../../components/ui/InfoBox.astro";
 import { getAllToolIds, getTool } from "../../../data/gathering";
-import { getRecipesProducingItem } from "../../../data/items";
 import { formatSpeedBonus, gatheringUrl } from "../../../data/helpers";
+import { getRecipesProducingItem } from "../../../data/items";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
 
 export function getStaticPaths() {
   return getAllToolIds().map((id) => ({ params: { id } }));

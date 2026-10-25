@@ -1,12 +1,12 @@
 import { query, queryOne } from "../lib/db";
 import { itemUrl, toolUrl } from "./helpers";
 import type {
+  GatheringTool,
+  Item,
   Recipe,
-  RecipeWithOutput,
   RecipeIngredient,
   RecipeOutput,
-  Item,
-  GatheringTool,
+  RecipeWithOutput,
 } from "./types";
 
 export function getAllRecipes(): RecipeWithOutput[] {
@@ -35,18 +35,14 @@ export function getRecipeOutput(recipe: Recipe): RecipeOutput {
     return { kind: "unknown", id: "" };
   }
 
-  const item = queryOne<Item>(
-    "SELECT * FROM items WHERE id = ?",
-    [recipe.output_item_id],
-  );
+  const item = queryOne<Item>("SELECT * FROM items WHERE id = ?", [recipe.output_item_id]);
   if (item) {
     return { kind: "item", item, url: itemUrl(item.id) };
   }
 
-  const tool = queryOne<GatheringTool>(
-    "SELECT * FROM gathering_tools WHERE id = ?",
-    [recipe.output_item_id],
-  );
+  const tool = queryOne<GatheringTool>("SELECT * FROM gathering_tools WHERE id = ?", [
+    recipe.output_item_id,
+  ]);
   if (tool) {
     return { kind: "tool", tool, url: toolUrl(tool.id) };
   }

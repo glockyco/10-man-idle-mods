@@ -1,10 +1,8 @@
 import { query, queryOne } from "../lib/db";
-import type { Raid, LootDrop } from "./types";
+import type { LootDrop, Raid } from "./types";
 
 export function getAllRaids(): Raid[] {
-  return query<Raid>(
-    "SELECT * FROM raids ORDER BY required_guild_level, name",
-  );
+  return query<Raid>("SELECT * FROM raids ORDER BY required_guild_level, name");
 }
 
 export function getRaid(id: string): Raid | undefined {

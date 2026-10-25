@@ -1,9 +1,9 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import InfoBox from "../../components/ui/InfoBox.astro";
 import LootTable from "../../components/ui/LootTable.astro";
-import { getAllRaidIds, getRaid, getRaidLoot } from "../../data/raids";
 import { formatDuration, formatGold } from "../../data/helpers";
+import { getAllRaidIds, getRaid, getRaidLoot } from "../../data/raids";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export function getStaticPaths() {
   return getAllRaidIds().map((id) => ({ params: { id } }));

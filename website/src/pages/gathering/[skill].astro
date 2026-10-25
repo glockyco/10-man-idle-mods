@@ -1,19 +1,19 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import ItemLink from "../../components/ui/ItemLink.astro";
 import {
   getDistinctSkills,
+  getDropsBySkill,
   getNodesBySkill,
   getToolsBySkill,
-  getDropsBySkill,
 } from "../../data/gathering";
 import {
-  toolUrl,
-  formatDuration,
-  formatSpeedBonus,
-  formatQuantityRange,
   formatChance,
+  formatDuration,
+  formatQuantityRange,
+  formatSpeedBonus,
+  toolUrl,
 } from "../../data/helpers";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export function getStaticPaths() {
   return getDistinctSkills().map((skill) => ({ params: { skill } }));

@@ -1,10 +1,8 @@
 import { query, queryOne } from "../lib/db";
-import type { Quest, LootDrop } from "./types";
+import type { LootDrop, Quest } from "./types";
 
 export function getAllQuests(): Quest[] {
-  return query<Quest>(
-    "SELECT * FROM quests ORDER BY min_character_level, name",
-  );
+  return query<Quest>("SELECT * FROM quests ORDER BY min_character_level, name");
 }
 
 export function getQuest(id: string): Quest | undefined {

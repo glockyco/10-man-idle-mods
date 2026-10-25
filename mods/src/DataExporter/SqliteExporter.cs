@@ -186,8 +186,7 @@ internal static class SqliteExporter
     private static int ExportItems(SqliteConnection conn, DataManager dm)
     {
         using var itemCmd = conn.CreateCommand();
-        itemCmd.CommandText =
-            """
+        itemCmd.CommandText = """
             INSERT INTO items (id, name, category, rarity, base_value, max_stack_size,
                 item_level, slot, armor_type, combat_power, material_type, tier,
                 consumable_type, duration, effect_value)
@@ -259,8 +258,7 @@ internal static class SqliteExporter
     private static int ExportGatheringNodes(SqliteConnection conn, DataManager dm)
     {
         using var nodeCmd = conn.CreateCommand();
-        nodeCmd.CommandText =
-            """
+        nodeCmd.CommandText = """
             INSERT INTO gathering_nodes (id, name, skill, required_level, base_duration)
             VALUES ($id, $name, $skill, $required_level, $base_duration)
             """;
@@ -272,8 +270,7 @@ internal static class SqliteExporter
         nodeCmd.Prepare();
 
         using var dropCmd = conn.CreateCommand();
-        dropCmd.CommandText =
-            """
+        dropCmd.CommandText = """
             INSERT INTO gathering_drops (node_id, item_id, min_quantity, max_quantity, chance)
             VALUES ($node_id, $item_id, $min_quantity, $max_quantity, $chance)
             """;
@@ -313,8 +310,7 @@ internal static class SqliteExporter
     private static int ExportRecipes(SqliteConnection conn, DataManager dm)
     {
         using var recipeCmd = conn.CreateCommand();
-        recipeCmd.CommandText =
-            """
+        recipeCmd.CommandText = """
             INSERT INTO recipes (id, name, skill, required_level, duration,
                 output_item_id, output_quantity, gold_cost)
             VALUES ($id, $name, $skill, $required_level, $duration,
@@ -331,8 +327,7 @@ internal static class SqliteExporter
         recipeCmd.Prepare();
 
         using var ingredCmd = conn.CreateCommand();
-        ingredCmd.CommandText =
-            """
+        ingredCmd.CommandText = """
             INSERT INTO recipe_ingredients (recipe_id, item_id, quantity)
             VALUES ($recipe_id, $item_id, $quantity)
             """;
@@ -371,8 +366,7 @@ internal static class SqliteExporter
     private static int ExportDungeons(SqliteConnection conn, DataManager dm)
     {
         using var cmd = conn.CreateCommand();
-        cmd.CommandText =
-            """
+        cmd.CommandText = """
             INSERT INTO dungeons (id, name, description, required_guild_level, difficulty,
                 recommended_combat_power, base_duration, gold_reward, experience_reward)
             VALUES ($id, $name, $description, $required_guild_level, $difficulty,
@@ -390,8 +384,7 @@ internal static class SqliteExporter
         cmd.Prepare();
 
         using var lootCmd = conn.CreateCommand();
-        lootCmd.CommandText =
-            """
+        lootCmd.CommandText = """
             INSERT INTO dungeon_loot (dungeon_id, item_id, min_quantity, max_quantity, chance)
             VALUES ($dungeon_id, $item_id, $min_quantity, $max_quantity, $chance)
             """;
@@ -435,8 +428,7 @@ internal static class SqliteExporter
     private static int ExportRaids(SqliteConnection conn, DataManager dm)
     {
         using var cmd = conn.CreateCommand();
-        cmd.CommandText =
-            """
+        cmd.CommandText = """
             INSERT INTO raids (id, name, description, required_guild_level, difficulty,
                 recommended_combat_power, base_duration, gold_reward, experience_reward)
             VALUES ($id, $name, $description, $required_guild_level, $difficulty,
@@ -454,8 +446,7 @@ internal static class SqliteExporter
         cmd.Prepare();
 
         using var lootCmd = conn.CreateCommand();
-        lootCmd.CommandText =
-            """
+        lootCmd.CommandText = """
             INSERT INTO raid_loot (raid_id, item_id, min_quantity, max_quantity, chance)
             VALUES ($raid_id, $item_id, $min_quantity, $max_quantity, $chance)
             """;
@@ -499,8 +490,7 @@ internal static class SqliteExporter
     private static int ExportQuests(SqliteConnection conn, DataManager dm)
     {
         using var cmd = conn.CreateCommand();
-        cmd.CommandText =
-            """
+        cmd.CommandText = """
             INSERT INTO quests (id, name, description, type, min_character_level,
                 recommended_combat_power, base_duration, gold_reward, experience_reward)
             VALUES ($id, $name, $description, $type, $min_character_level,
@@ -518,8 +508,7 @@ internal static class SqliteExporter
         cmd.Prepare();
 
         using var rewardCmd = conn.CreateCommand();
-        rewardCmd.CommandText =
-            """
+        rewardCmd.CommandText = """
             INSERT INTO quest_rewards (quest_id, item_id, min_quantity, max_quantity, chance)
             VALUES ($quest_id, $item_id, $min_quantity, $max_quantity, $chance)
             """;
@@ -598,8 +587,7 @@ internal static class SqliteExporter
     private static void ExportSuffixes(SqliteConnection conn)
     {
         using var cmd = conn.CreateCommand();
-        cmd.CommandText =
-            """
+        cmd.CommandText = """
             INSERT INTO suffixes (id, name, category, combat_power_multiplier)
             VALUES ($id, $name, $category, $combat_power_multiplier)
             """;
@@ -622,8 +610,7 @@ internal static class SqliteExporter
     private static int ExportGatheringTools(SqliteConnection conn, DataManager dm)
     {
         using var cmd = conn.CreateCommand();
-        cmd.CommandText =
-            """
+        cmd.CommandText = """
             INSERT INTO gathering_tools (id, name, skill, speed_bonus)
             VALUES ($id, $name, $skill, $speed_bonus)
             """;
@@ -650,8 +637,7 @@ internal static class SqliteExporter
     private static void ExportGameConstants(SqliteConnection conn)
     {
         using var cmd = conn.CreateCommand();
-        cmd.CommandText =
-            "INSERT INTO game_constants (key, value) VALUES ($key, $value)";
+        cmd.CommandText = "INSERT INTO game_constants (key, value) VALUES ($key, $value)";
         var pKey = cmd.Parameters.Add("$key", SqliteType.Text);
         var pValue = cmd.Parameters.Add("$value", SqliteType.Text);
         cmd.Prepare();

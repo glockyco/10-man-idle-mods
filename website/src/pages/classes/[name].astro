@@ -1,9 +1,9 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import InfoBox from "../../components/ui/InfoBox.astro";
-import RoleBadge from "../../components/ui/RoleBadge.astro";
 import ItemLink from "../../components/ui/ItemLink.astro";
+import RoleBadge from "../../components/ui/RoleBadge.astro";
 import { getAllClassNames, getClass, getClassEquipment } from "../../data/classes";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export function getStaticPaths() {
   return getAllClassNames().map((name) => ({ params: { name } }));
@@ -24,9 +24,7 @@ const crumbs = [
   { label: cls.name },
 ];
 
-const overviewRows = [
-  { label: "Armor Type", value: cls.armor_type },
-];
+const overviewRows = [{ label: "Armor Type", value: cls.armor_type }];
 ---
 
 <BaseLayout title={cls.name} crumbs={crumbs}>
