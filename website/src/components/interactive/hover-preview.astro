@@ -74,11 +74,19 @@
       currentTarget = null;
     }
 
+    function previewTarget(event) {
+      // Text nodes use their parent element. Document boundary events have none.
+      var element = event.target instanceof Element
+        ? event.target
+        : event.target instanceof Node ? event.target.parentElement : null;
+      return element ? element.closest("[data-preview]") : null;
+    }
+
     // Eagerly load preview data
     loadData();
 
     document.addEventListener("pointerenter", function (e) {
-      var target = e.target.closest("[data-preview]");
+      var target = previewTarget(e);
       if (!target) return;
       currentTarget = target;
       clearTimeout(showTimer);
@@ -88,12 +96,12 @@
     }, true);
 
     document.addEventListener("pointerleave", function (e) {
-      var target = e.target.closest("[data-preview]");
+      var target = previewTarget(e);
       if (target) hide();
     }, true);
 
     document.addEventListener("focusin", function (e) {
-      var target = e.target.closest("[data-preview]");
+      var target = previewTarget(e);
       if (target) {
         currentTarget = target;
         show(target);
@@ -101,7 +109,7 @@
     });
 
     document.addEventListener("focusout", function (e) {
-      var target = e.target.closest("[data-preview]");
+      var target = previewTarget(e);
       if (target) hide();
     });
   })();
