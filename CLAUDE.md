@@ -6,7 +6,7 @@ Monorepo for game mods and a data wiki for "10-Man Idle"
 ## Repository layout
 
 - mods/          game mod framework + plugins (incl. data exporter)
-- data/          generated SQLite database (committed)
+- data/          committed game-data export used to build the site
 - website/       Astro static wiki site
 - scripts/       build and extraction scripts
 
@@ -37,14 +37,16 @@ Data export (requires running the game once with mods installed):
 The DataExporter mod writes Mods/export/10man-idle.db on first
 frame. The script copies it to data/ and website/public/.
 
-Website (requires Node.js + pnpm):
+Website (requires Node.js and pnpm):
 
-    cd website && pnpm install && pnpm run build
+    pnpm install --frozen-lockfile
+    pnpm --dir website build
 
-Dev server: pnpm dev
+The committed database lets the website build without the game.
+Run `pnpm --dir website dev` for the development server.
 
 The native version.dll proxy (mods/src/VersionProxy/) is compiled
-separately — see mods/src/VersionProxy/build.bat.
+separately. See mods/src/VersionProxy/build.bat.
 
 ## Dev testing (mods)
 
@@ -67,7 +69,7 @@ Conventional commits following cbea.ms guidelines:
 
 - Format: type(scope): subject
 - Types: feat, fix, chore, docs, refactor, test, build, ci
-- Scopes: mods, speed-mod, mod-loader, proxy, data-exporter, website
+- Allowed scopes are defined in commitlint.config.js.
 - Subject line: imperative mood, no period, max 72 chars with prefix
 - Body: explain what and why (not how), wrap at 72 characters
 - Separate subject and body with a blank line
@@ -76,31 +78,37 @@ Conventional commits following cbea.ms guidelines:
 
 All in TacticsGuildIdle namespace (despite assembly name 10ManIdle):
 
-- Game1 (10ManIdle.dll) — main game class, Update loop
-- Core.GameManager — singleton via .Instance
-- Core.GameTimeManager — TimeMultiplier property scales all systems
-- Core.DataManager — all game data dictionaries
-- Entities.Character — player character with skills/gear/inventory
-- Systems.* — GatheringSystem, CraftingSystem, DungeonSystem, etc.
+- Game1 (10ManIdle.dll): main game class, Update loop
+- Core.GameManager: singleton via .Instance
+- Core.GameTimeManager: TimeMultiplier property scales all systems
+- Core.DataManager: all game data dictionaries
+- Entities.Character: player character with skills/gear/inventory
+- Systems.*: GatheringSystem, CraftingSystem, DungeonSystem, etc.
 
 ## Code style
 
 - C# with file-scoped namespaces, 4-space indent
 - TypeScript for website (strict mode), 2-space indent
-- Astro components for pages, Svelte for interactive islands
+- Astro components for pages and browser scripts for interactivity
 - No unnecessary abstractions
 - Harmony 2.3+ (required for .NET 8 tiered compilation compat)
 
 ## Tooling
 
-Pre-commit hooks via Lefthook. Install after clone:
+Install dependencies from the repository root, then enable Lefthook:
 
-    lefthook install
+    pnpm install --frozen-lockfile
     dotnet tool restore
-    cd website && pnpm install
+    lefthook install
+
+The root package supplies repository-wide tools. The pnpm workspace
+configuration includes the website and permits native dependency builds.
+Use the root lockfile for reproducible installs.
 
 Hooks run automatically on commit:
-- Biome (format + lint TS/Astro/Svelte)
-- CSharpier (format C#)
-- svelte-check (type checking)
-- commitlint (conventional commit enforcement)
+- Biome checks website formatting, lint and imports.
+- CSharpier checks C# formatting.
+- commitlint checks the commit message.
+
+Run all source hooks with `lefthook run pre-commit --all-files`.
+The hook commands and file selection live in lefthook.yml.

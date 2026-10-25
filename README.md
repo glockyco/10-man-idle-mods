@@ -24,17 +24,17 @@ DataExporter replaces `Mods/export/10man-idle.db` in the game directory on the f
 
 ## Build or change the Codex
 
-You also need Node.js and pnpm. After launching the modded game to export its data, close the game and run these commands from the repository root in Command Prompt:
+You need Node.js and pnpm. Install from the repository root and build using the committed database. You do not need the game to build the site.
 
-```bat
-scripts\export-data.bat
-cd website
-pnpm install
-pnpm build
-pnpm dev
+```sh
+pnpm install --frozen-lockfile
+pnpm --dir website build
+pnpm --dir website dev
 ```
 
-The export script copies the database into the repository's `data/` and `website/public/` directories. The Astro site reads that database to build its pages. The build also checks links and creates the Pagefind search index, which the development server needs for search. Open the address printed by the development server.
+To refresh the database, launch the modded game, close it and run `scripts\export-data.bat` from the repository root in Command Prompt. The export script copies the database into the repository's `data/` and `website/public/` directories.
+
+The Astro site reads the database in `data/` to build its pages. The build also checks links and creates the Pagefind search index, which the development server needs for search. Open the address printed by the development server.
 
 `pnpm cf-deploy`, from `website/`, builds and publishes the site through Cloudflare Wrangler. The public database copy is included in the site.
 
